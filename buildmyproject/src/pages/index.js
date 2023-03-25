@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { useState } from 'react'
+import { use, useState } from 'react'
 import styles from '@/styles/Home.module.css'
 import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore} from "firebase/firestore"
@@ -58,17 +58,17 @@ export default function Home({arrayofprojects}) {
       </div>)
   
      })}
-     <RegisterPopup isOpen={isOpen} setSignUp={setSignUp} isSignup={isSignup}/>
+     <RegisterPopup isOpen={isOpen} setSignUp={setSignUp} isSignup={isSignup} setOpen={setOpen}/>
 
       </div>
     </>
   )
 }
-const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp}) => {
+const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [route,setRoute]=useState('nor')
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -80,6 +80,7 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp}) => {
     // Close the popup after submitting the form
    // onClose();
     setSignUp(true)
+    setOpen(false)
   };
 
   if (!isOpen) {
@@ -98,7 +99,34 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp}) => {
       justifyContent: 'center',
       alignItems: 'center'
     }}>
-      <div style={{ 
+      <div style={{background:'white',padding:'70px',maxWidth:'200px'}}>
+
+      <button onClick={()=>setRoute('log')} style={{ 
+          background: '#0070f3',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '5px',
+          border: 'none',
+          cursor: 'pointer',
+          marginTop: '10px',
+          fontWeight: 'bold',
+          fontSize: '16px'
+        }}>Log in</button><br/>
+    <button onClick={()=>setRoute('reg')} style={{ 
+          background: '#0070f3',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '5px',
+          border: 'none',
+          cursor: 'pointer',
+          marginTop: '10px',
+          fontWeight: 'bold',
+          fontSize: '16px'
+        }}>Sign Up</button>
+      </div>
+    
+
+      { route==='reg' && <div style={{ 
         backgroundColor: 'white',
         padding: '20px',
         borderRadius: '5px',
@@ -132,7 +160,42 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp}) => {
             fontSize: '16px'
           }}>Register</button>
         </form>
-      </div>
+      </div>}
+      { route=='log' && <div style={{ 
+        backgroundColor: 'white',
+        padding: '20px',
+        borderRadius: '5px',
+        width: '400px'
+      }}>
+        <h2 style={{ 
+          fontSize: '24px',
+          marginBottom: '20px'
+        }}>Register Student</h2>
+        <form onSubmit={handleSubmit}>
+          {/* <div style={{ marginBottom: '10px' }}>
+            <label htmlFor="name" style={{ marginRight: '10px' }}>Name:</label>
+            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} />
+          </div> */}
+          <div style={{ marginBottom: '10px' }}>
+            <label htmlFor="email" style={{ marginRight: '10px' }}>Email:</label>
+            <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label htmlFor="password" style={{ marginRight: '10px' }}>Password:</label>
+            <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+          <button type="submit" style={{ 
+            background: '#0070f3',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '5px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '16px'
+          }}>Register</button>
+        </form>
+      </div>}
     </div>
   );
 };
