@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { useParams, useState } from 'react'
+import { useEffect, useParams, useState } from 'react'
 
 import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc} from "firebase/firestore"
@@ -18,7 +18,14 @@ export default function ProposalSend({projectId,Uid}) {
    const [proposal, setProposal] = useState("");
    const [link, setLink] = useState("");
    const [resume, setResume] = useState(null);
- 
+   useEffect(()=>{
+    const docRef=doc(db,"Users",Uid)
+    getDoc(docRef).then((res)=>{
+      setEmail(res.data().email)
+      setName(res.data().name)
+    })
+   },[])
+
    const handleSubmit = (e) => {
      e.preventDefault();
      // Do something with form data
@@ -132,6 +139,7 @@ export default function ProposalSend({projectId,Uid}) {
       id="name"
       name="name"
       value={name}
+      
       onChange={(e) => setName(e.target.value)}
       style={{
         padding: "10px",
