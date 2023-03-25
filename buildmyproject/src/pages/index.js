@@ -7,11 +7,15 @@ import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc} from "firebase/firestore"
 import { async } from '@firebase/util'
 import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
+import { useRouter } from 'next/router'
 
 
 export default function Home({arrayofprojects}) {
-   const [isSignup,setSignUp]=useState(false)
-   const [isOpen,setOpen]=useState(false)
+   const [isSignup,setSignUp]=useState(false);
+   const [isOpen,setOpen]=useState(false);
+    const router=useRouter()
+    const [button,setButton]=useState('signup')
+    const [id,setId]=useState('')
 
   return (
     <>
@@ -40,7 +44,7 @@ export default function Home({arrayofprojects}) {
         <p>{item.data.Category}</p>
         <p>{item.data.Subcategory}</p>
         <h1 style={{color:'green'}}>rs.{item.data.Budget}</h1>
-        <button style={{ 
+        {button==='signup'?<button style={{ 
           background: '#0070f3',
           color: 'white',
           padding: '10px',
@@ -54,18 +58,32 @@ export default function Home({arrayofprojects}) {
             if(!isSignup){
               setOpen(true)
             }
-        }}>Apply</button>
+        }}>Sign Up</button>:<button style={{ 
+          background: '#0070f3',
+          color: 'white',
+          padding: '10px',
+          borderRadius: '5px',
+          border: 'none',
+          cursor: 'pointer',
+          marginTop: '10px',
+          fontWeight: 'bold',
+          fontSize: '16px'
+        }}  onClick={()=>{
+          
+            router.push({pathname:'/apply',query:{proid:item.id,uid:id}})
+          
+        }}>Apply</button>}
         
       </div>)
   
      })}
-     <RegisterPopup isOpen={isOpen} setSignUp={setSignUp} isSignup={isSignup} setOpen={setOpen}/>
+     <RegisterPopup isOpen={isOpen} setSignUp={setSignUp} isSignup={isSignup} setOpen={setOpen} button={button} setButton={setButton} setId={setId}/>
 
       </div>
     </>
   )
 }
-const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
+const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen,button,setButton,setId}) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -97,11 +115,12 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
     
   // };
   const handleLogin=(event)=>{
-    console.log("regr")
+   // console.log("regr")
   const auth = getAuth();
   signInWithPopup(auth, provider)
     .then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
+
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
       // The signed-in user info.
@@ -114,22 +133,22 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
     uid:user.uid,
     pic:user.photoURL
    }).then((res)=>{
-    
+     console.log(res)
     setSignUp(true)
     setOpen(false)
+    setButton('apply')
+    setId(res.id)
    }).catch((err)=>{
     console.log(err)
    })
      
     }).catch((error) => {
-      // Handle Errors here.
+      
       const errorCode = error.code;
       const errorMessage = error.message;
-      // The email of the user's account used.
-     // const email = error.customData.email;
-      // The AuthCredential type that was used.
+     
       const credential = GoogleAuthProvider.credentialFromError(error);
-      // ...
+      
     });
 
 
@@ -149,7 +168,7 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
      uid:user.uid,
      pic:user.photoURL
     }).then((res)=>{
-     
+     console.log(res)
      setSignUp(true)
      setOpen(false)
     }).catch((err)=>{
