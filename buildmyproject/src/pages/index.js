@@ -72,29 +72,30 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
   const [route,setRoute]=useState('nor')
   const db=getFirestore(app)
   const provider = new GoogleAuthProvider();
-  const handleSubmitSignUp = (event) => {
-    event.preventDefault();
+  const auth = getAuth();
+  // const handleSubmitSignUp = (event) => {
+  //   event.preventDefault();
 
-    // TODO: Add code to register the student with the provided details
-    console.log('Name:', name);
-    console.log('Email:', email);
-    console.log('Password:', password);
+  //   // TODO: Add code to register the student with the provided details
+  //   console.log('Name:', name);
+  //   console.log('Email:', email);
+  //   console.log('Password:', password);
    
-   const docRef=collection(db,"Users");
-   addDoc(docRef,{
-    name:name,
-    email:email,
-    password:password
-   }).then((res)=>{
-    alert("Registration successful");
-    setSignUp(true)
-    setOpen(false)
-   }).catch((err)=>{
-    alert("Can not register some error occurred");
-   })
+  //  const docRef=collection(db,"Users");
+  //  addDoc(docRef,{
+  //   name:name,
+  //   email:email,
+  //   password:password
+  //  }).then((res)=>{
+  //   alert("Registration successful");
+  //   setSignUp(true)
+  //   setOpen(false)
+  //  }).catch((err)=>{
+  //   alert("Can not register some error occurred");
+  //  })
     
     
-  };
+  // };
   const handleLogin=(event)=>{
     console.log("regr")
   const auth = getAuth();
@@ -133,6 +134,36 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
 
 
   }
+  const handleSingUpWithEmail=(event)=>{
+    event.preventDefault();
+    createUserWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    // ...
+   
+    const docRef=collection(db,"Users");
+    addDoc(docRef,{
+     name:name,
+     email:user.email,
+     uid:user.uid,
+     pic:user.photoURL
+    }).then((res)=>{
+     
+     setSignUp(true)
+     setOpen(false)
+    }).catch((err)=>{
+     console.log(err)
+    })
+
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    alert(errorMessage);
+    // ..
+  });
+  }
 
   if (!isOpen) {
     return null;
@@ -150,32 +181,104 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
       justifyContent: 'center',
       alignItems: 'center'
     }}>
-     { route==='nor' && <div style={{background:'white',padding:'70px',maxWidth:'200px'}}>
+     <div  style={{ 
+  backgroundColor: '#F8F9FA',
+  padding: '20px',
+  padding:'40px',
+  borderRadius: '5px',
+  width: '400px',
+  boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
+}}>
+        <h2 style={{ 
+    fontSize: '24px',
+    marginBottom: '20px',
+    textAlign: 'center',
+    color: '#343A40',
+    textTransform: 'uppercase'
+  }}>Register Student</h2>
+        <form onSubmit={handleSingUpWithEmail}>
+           <div style={{ marginBottom: '10px' }}>
+            <label htmlFor="name"style={{ 
+        marginRight: '10px',
+        display: 'block',
+        color: '#343A40',
+        fontSize: '16px'
+      }}>Name:</label>
+            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)}  style={{ 
+        width: '100%',
+        padding: '10px',
+        border: '1px solid #ced4da',
+        borderRadius: '5px'
+      }}/>
+          </div> 
+          <div style={{ marginBottom: '10px' }}>
+            <label htmlFor="email" style={{ 
+        marginRight: '10px',
+        display: 'block',
+        color: '#343A40',
+        fontSize: '16px'
+      }}>Email:</label>
+            <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ 
+        width: '100%',
+        padding: '10px',
+        border: '1px solid #ced4da',
+        borderRadius: '5px'
+      }} />
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label htmlFor="password" style={{ 
+        marginRight: '10px',
+        display: 'block',
+        color: '#343A40',
+        fontSize: '16px'
+      }}>Password:</label>
+            <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ 
+        width: '100%',
+        padding: '10px',
+        border: '1px solid #ced4da',
+        borderRadius: '5px'
+      }} />
+          </div>
+          <button type="submit" style={{ 
+      background: '#0070f3',
+      color: 'white',
+      padding: '10px 20px',
+      borderRadius: '5px',
+      border: 'none',
+      cursor: 'pointer',
+      fontWeight: 'bold',
+      fontSize: '16px',
+      display: 'block',
+      margin: '0 auto',
+      width: '100%',
+      maxWidth: '200px',
+      textTransform: 'uppercase'
+    }} >Register or Login</button>
+        </form>
+        <button onClick={handleLogin} style={{ 
+  background: '#fff',
+  color: '#333',
+  padding: '10px 20px',
+  borderRadius: '5px',
+  border: '1px solid #ccc',
+  cursor: 'pointer',
+  marginTop: '10px',
+  fontWeight: 'bold',
+  fontSize: '16px',
+  display: 'block',
+  margin: '0 auto',
+  width: '100%',
+  maxWidth: '200px',
+  textTransform: 'uppercase',
+  backgroundImage: 'url("https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg")',
+  backgroundPosition: 'left center',
+  backgroundRepeat: 'no-repeat',
+  paddingLeft: '40px',
+  backgroundSize: '24px 24px'
+}}>Sign in with Google</button>
 
-      <button onClick={handleLogin} style={{ 
-          background: '#0070f3',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '5px',
-          border: 'none',
-          cursor: 'pointer',
-          marginTop: '10px',
-          fontWeight: 'bold',
-          fontSize: '16px'
-        }} >Log in with Google</button><br/>
-    <button onClick={()=>setRoute('reg')} style={{ 
-          background: '#0070f3',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '5px',
-          border: 'none',
-          cursor: 'pointer',
-          marginTop: '10px',
-          fontWeight: 'bold',
-          fontSize: '16px'
-        }}>Sign Up</button>
       </div>
-}
+
     
 
       { route==='reg' && <div style={{ 
@@ -213,41 +316,7 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen}) => {
           }}>Register</button>
         </form>
       </div>}
-      { route=='log' && <div style={{ 
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '5px',
-        width: '400px'
-      }}>
-        <h2 style={{ 
-          fontSize: '24px',
-          marginBottom: '20px'
-        }}>Register Student</h2>
-        <form onSubmit={handleLogin}>
-          {/* <div style={{ marginBottom: '10px' }}>
-            <label htmlFor="name" style={{ marginRight: '10px' }}>Name:</label>
-            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} />
-          </div> */}
-          <div style={{ marginBottom: '10px' }}>
-            <label htmlFor="email" style={{ marginRight: '10px' }}>Email:</label>
-            <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div style={{ marginBottom: '20px' }}>
-            <label htmlFor="password" style={{ marginRight: '10px' }}>Password:</label>
-            <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          <button type="submit" style={{ 
-            background: '#0070f3',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '5px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '16px'
-          }}>Log In</button>
-        </form>
-      </div>}
+    
     </div>
   );
 };
