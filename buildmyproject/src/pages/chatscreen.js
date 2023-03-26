@@ -4,20 +4,33 @@ import { Inter } from 'next/font/google'
 import { useEffect, useParams, useState } from 'react'
 
 import app from "../firebase"
-import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc,query,where,orderBy} from "firebase/firestore"
+import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc,query,where,orderBy, serverTimestamp} from "firebase/firestore"
 import { async } from '@firebase/util'
-import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
+import { onSnapshot } from 'firebase/firestore'
+//import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
 import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 
-export default function ChatScreen({clientId,recepentId}) {
+export default function ChatScreen({clientId,UserId}) {
+  const db=getFirestore(app);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-  
+    const [clientName,setC]=useState('')
+    const [userName,setU]=useState('')
+    console.log(clientId +UserId)
     useEffect(() => {
-      // Subscribe to messages collection for this chat
+ 
+      const userref=doc(db,"Users",UserId);
+      const clientref=doc(db,"Users",clientId);
+  getDoc(userref).then((res)=>{
+    setU(res.data().name)
+  })
+  getDoc(clientref).then((res)=>{
+    setC(res.data().name)
+  })
+
       const messagesQuery = query(
         collection(db, 'messages'),
-        where('users', '==', [currentUser.uid, recipientUser.uid].sort()),
+        where('users', '==', [clientId, UserId]?.sort()),
         orderBy('timestamp')
       );
       
@@ -25,19 +38,20 @@ export default function ChatScreen({clientId,recepentId}) {
       onSnapshot(messagesQuery, querySnapshot => {
         const newMessages = [];
         querySnapshot.forEach(doc => {
+          console.log(doc.data())
           newMessages.push(doc.data());
         });
         setMessages(newMessages);
       });
-    }, [currentUser.uid, recipientUser.uid]);
+    }, [clientId, UserId]);
   
     const sendMessage = () => {
       db.collection('messages').add({
         users: [clientId.uid, recipientUser.uid].sort(),
-        sender: currentUser.uid,
-        recipient: recipientUser.uid,
+        sender: clientId,
+        recipient: UserId,
         message,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        timestamp: serverTimestamp(),
       });
       setMessage('');
     };
@@ -51,13 +65,13 @@ export default function ChatScreen({clientId,recepentId}) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+     {/* <div>
      <div>
-     <div>
-      <h2>Chatting with {recipientUser.displayName}</h2>
+      <h2>Chatting with {clientName}</h2>
       <ul>
         {messages.map((msg, i) => (
           <li key={i}>
-            <strong>{msg.sender === currentUser.uid ? 'You' : recipientUser.displayName}:</strong> {msg.message}
+            <strong>{msg.sender === UserId ? 'You' : clientId}:</strong> {msg.message}
           </li>
         ))}
       </ul>
@@ -66,23 +80,69 @@ export default function ChatScreen({clientId,recepentId}) {
         <button onClick={sendMessage}>Send</button>
       </div>
     </div>
-
-
+</div> */}
+<div style={{ 
+  display: 'flex', 
+  flexDirection: 'column', 
+  height: '100vh', 
+  justifyContent: 'space-between' 
+}}>
+  <div style={{ 
+    padding: '1rem', 
+    backgroundColor: '#f0f0f0', 
+    borderBottom: '1px solid #ccc' 
+  }}>
+    <h2 style={{ margin: 0 }}>Chatting with {clientName}</h2>
+  </div>
+  <ul style={{ 
+    padding: 0, 
+    margin: 0, 
+    overflowY: 'auto', 
+    flexGrow: 1 
+  }}>
+    {messages.map((msg, i) => (
+      <li key={i} style={{ 
+        listStyleType: 'none', 
+        padding: '0.5rem 1rem', 
+        textAlign: msg.sender === UserId ? 'right' : 'left' 
+      }}>
+        <strong>{msg.sender === UserId ? 'You' : clientId}:</strong> {msg.message}
+      </li>
+    ))}
+  </ul>
+  <div style={{ 
+    display: 'flex', 
+    alignItems: 'center', 
+    padding: '1rem', 
+    borderTop: '1px solid #ccc' 
+  }}>
+    <input type="text" value={message} onChange={e => setMessage(e.target.value)} style={{ 
+      flex: 1, 
+      marginRight: '0.5rem', 
+      padding: '0.5rem', 
+      borderRadius: '9999px', 
+      border: '1px solid #ccc' 
+    }} />
+    <button onClick={sendMessage} style={{ 
+      backgroundColor: '#4CAF50', 
+      color: 'white', 
+      border: 'none', 
+      padding: '0.5rem 1rem', 
+      borderRadius: '9999px', 
+      cursor: 'pointer' 
+    }}>Send</button>
+  </div>
 </div>
     </>
   )
 }
 export async function getServerSideProps({ query}) {
-  const clienttId = query.clientid;
-  const Userid = query.clientid;
-    
-   //const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
-   
-//   getDoc(docRef).then()
+  const clientId = query.clienttId;
+  const UserId = query.Userid;
     return {
       props: {
-        projectId,
-        Uid
+        clientId,
+       UserId
       }
     }
   }

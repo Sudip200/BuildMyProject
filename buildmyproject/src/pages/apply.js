@@ -4,10 +4,11 @@ import { Inter } from 'next/font/google'
 import { useEffect, useParams, useState } from 'react'
 
 import app from "../firebase"
-import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc} from "firebase/firestore"
+import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc, Timestamp, serverTimestamp} from "firebase/firestore"
 import { async } from '@firebase/util'
 import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
 import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
+import { useRouter } from 'next/router'
 
 export default function ProposalSend({projectId,Uid,clientid}) {
 
@@ -18,7 +19,7 @@ export default function ProposalSend({projectId,Uid,clientid}) {
    const [proposal, setProposal] = useState("");
    const [link, setLink] = useState("");
    const [resume, setResume] = useState(null);
-  
+  const router =useRouter()
    const storageRef = ref(storage,`resumes/${resume}`);
    useEffect(()=>{
     const docRef=doc(db,"Users",Uid)
@@ -37,15 +38,21 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       console.log('Uploaded a blob or file!');
       getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
           addDoc(proRef,{
-            projectid:projectId,
-            uid:Uid,
-            name:name,
-            email:email,
-            proposal:proposal,
-            link:link,
-            resume:url
+            // projectid:projectId,
+            // uid:Uid,
+            // name:name,
+            // email:email,
+            // proposal:proposal,
+            // link:link,
+            // resume:url
+            users: [clientid, Uid].sort(),
+            sender:Uid,
+            recipient: clientid,
+            message:`Hi My Name is ${name} email ${email} 
+            ${proposal} .My Url link ${link} .My Resume link ${url}`,
+            timestamp: serverTimestamp(),
           }).then((res)=>{
-            alert("Successfull")
+           router.push({pathname:'/chatscreen',query:{clienttId:clientid, Userid:Uid}})
           }).catch(err=>alert(err));
       })
     }).catch(err=>alert(err));
