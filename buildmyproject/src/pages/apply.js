@@ -7,17 +7,20 @@ import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc} from "firebase/firestore"
 import { async } from '@firebase/util'
 import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
-
+import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 
 export default function ProposalSend({projectId,Uid}) {
 
    const db=getFirestore(app)
+   const storage = getStorage(app);
+ 
   // const docRef=doc(db,"AllProjects",projectId)
    const [name, setName] = useState("");
    const [email, setEmail] = useState("");
    const [proposal, setProposal] = useState("");
    const [link, setLink] = useState("");
    const [resume, setResume] = useState(null);
+   const storageRef = ref(storage,`resumes/${resume}`);
    useEffect(()=>{
     const docRef=doc(db,"Users",Uid)
     getDoc(docRef).then((res)=>{
@@ -29,13 +32,25 @@ export default function ProposalSend({projectId,Uid}) {
    const handleSubmit = (e) => {
      e.preventDefault();
      // Do something with form data
-     console.log({ name, email, proposal, link, resume });
-     // Reset form
-     setName("");
-     setEmail("");
-     setProposal("");
-     setLink("");
-     setResume(null);
+     const proRef=collection(db,"Proposals");
+     uploadBytes(storageRef, resume).then((snapshot) => {
+      console.log('Uploaded a blob or file!');
+      getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
+          addDoc(proRef,{
+            projectid:projectId,
+            uid:Uid,
+            name:name,
+            email:email,
+            proposal:proposal,
+            link:link,
+            resume:url
+          }).then((res)=>{
+            alert("Successfull")
+          }).catch(err=>alert(err));
+      })
+    }).catch(err=>alert(err));
+
+
    };
 
   return (
