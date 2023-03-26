@@ -70,7 +70,7 @@ export default function Home({arrayofprojects}) {
           fontSize: '16px'
         }}  onClick={()=>{
           
-            router.push({pathname:'/apply',query:{proid:item.id,uid:id}})
+            router.push({pathname:'/apply',query:{proid:item.id,uid:id,clientid:item.data.uid}})
           
         }}>Apply</button>}
         
@@ -133,7 +133,7 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen,button,setB
     setSignUp(true)
     setOpen(false)
     setButton('apply')
-    setId(res.id)
+    setId(user.uid)
    }).catch((err)=>{
     console.log(err)
    })
@@ -168,7 +168,7 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen,button,setB
      setSignUp(true)
      setOpen(false)
      setButton('apply')
-    setId(res.uid)
+      setId(res.uid)
     }).catch((err)=>{
      console.log(err)
     })

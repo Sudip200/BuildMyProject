@@ -9,30 +9,30 @@ import { async } from '@firebase/util'
 import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
 import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 
-export default function ProposalSend({projectId,Uid}) {
+export default function ProposalSend({projectId,Uid,clientid}) {
 
    const db=getFirestore(app)
    const storage = getStorage(app);
- 
-  // const docRef=doc(db,"AllProjects",projectId)
    const [name, setName] = useState("");
    const [email, setEmail] = useState("");
    const [proposal, setProposal] = useState("");
    const [link, setLink] = useState("");
    const [resume, setResume] = useState(null);
+  
    const storageRef = ref(storage,`resumes/${resume}`);
    useEffect(()=>{
     const docRef=doc(db,"Users",Uid)
     getDoc(docRef).then((res)=>{
       setEmail(res.data().email)
       setName(res.data().name)
-    })
+    }).catch(err=>console.log(err))
    },[])
+   
 
    const handleSubmit = (e) => {
      e.preventDefault();
      // Do something with form data
-     const proRef=collection(db,"Proposals");
+     const proRef=collection(db,"messages");
      uploadBytes(storageRef, resume).then((snapshot) => {
       console.log('Uploaded a blob or file!');
       getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
@@ -49,10 +49,7 @@ export default function ProposalSend({projectId,Uid}) {
           }).catch(err=>alert(err));
       })
     }).catch(err=>alert(err));
-
-
    };
-
   return (
     <>
       <Head>
@@ -61,74 +58,7 @@ export default function ProposalSend({projectId,Uid}) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-     {/* <div>
-     <form
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        maxWidth: "500px",
-        margin: "0 auto",
-      }}
-      onSubmit={handleSubmit}
-    >
-      <label htmlFor="name">Name</label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        style={{ marginBottom: "10px" }}
-        required
-      />
-
-      <label htmlFor="email">Contact Email</label>
-      <input
-        type="email"
-        id="email"
-        name="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{ marginBottom: "10px" }}
-        required
-      />
-
-      <label htmlFor="proposal">Proposal</label>
-      <textarea
-        id="proposal"
-        name="proposal"
-        value={proposal}
-        onChange={(e) => setProposal(e.target.value)}
-        style={{ marginBottom: "10px" }}
-        required
-      />
-
-      <label htmlFor="link">Relevant Link</label>
-      <input
-        type="url"
-        id="link"
-        name="link"
-        value={link}
-        onChange={(e) => setLink(e.target.value)}
-        style={{ marginBottom: "10px" }}
-        required
-      />
-
-      <label htmlFor="resume">Resume Upload</label>
-      <input
-        type="file"
-        id="resume"
-        name="resume"
-        onChange={(e) => setResume(e.target.files[0])}
-        style={{ marginBottom: "10px" }}
-        required
-      />
-
-      <button type="submit" style={{ marginTop: "10px" }}>
-        Submit
-      </button>
-    </form>
-     </div> */}
+     
      <div>
   <form
     style={{
@@ -280,6 +210,7 @@ export default function ProposalSend({projectId,Uid}) {
 export async function getServerSideProps({ query}) {
   const projectId = query.proid;
   const Uid = query.uid;
+  const clientid=query.clientid;
     
    //const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
    
@@ -287,7 +218,8 @@ export async function getServerSideProps({ query}) {
     return {
       props: {
         projectId,
-        Uid
+        Uid,
+         clientid
       }
     }
   }
