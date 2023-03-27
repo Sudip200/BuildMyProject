@@ -8,6 +8,23 @@ import {collection,doc,setDoc,getDocs,getFirestore,addDoc} from "firebase/firest
 import { async } from '@firebase/util'
 import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword} from "firebase/auth";
 import { useRouter } from 'next/router'
+import React from 'react';
+import  AccountBox  from '@mui/icons-material/AccountBox'
+import { PersonAdd } from '@mui/icons-material'
+import ListSubheader from '@mui/material/ListSubheader'
+import ListIcon from '@mui/icons-material/List';
+import Drawer from '@mui/material/Drawer';
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import Avatar from '@mui/material/Avatar';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import SettingsIcon from '@mui/icons-material/Settings';
+
+import Link from 'next/link'
 
 
 export default function Home({arrayofprojects}) {
@@ -16,7 +33,24 @@ export default function Home({arrayofprojects}) {
     const router=useRouter()
     const [button,setButton]=useState('signup')
     const [id,setId]=useState('')
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
 
+    const handleToggleDrawer = () => {
+      setIsDrawerOpen(!isDrawerOpen);
+    };
+  
+
+    const handleInputChange = (event) => {
+      setSearchQuery(event.target.value);
+    }
+  
+    const handleSearch = (event) => {
+      event.preventDefault();
+      console.log(`Search Query: ${searchQuery}`);
+      // Perform search logic here
+    }
+  
   return (
     <>
       <Head>
@@ -26,20 +60,61 @@ export default function Home({arrayofprojects}) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div style={{}}>
-        <h1 style={{textAlign:'center'}}>All Projects that are available currently</h1>
+        
+      <div style={{ display: 'flex', justifyContent: 'center' ,padding:'40px',marginTop:'2%',gap:'6%'}}>
+      
+      <ListIcon
+      sx={{
+        width: '42px',
+        height: '42px',
+        '&:hover': {
+          cursor: 'pointer',
+        },
+        marginRight:'10%'
+      }}
+      onClick={handleToggleDrawer}
+    />
+      <NavigationDrawer isOpen={isDrawerOpen} onClose={handleToggleDrawer} />
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchQuery}
+        onChange={handleInputChange}
+        style={{
+          padding: '8px',
+          borderRadius: '4px',
+          border: '1px solid #ccc',
+          marginRight: '8px',
+          width: '300px',
+          height:'30px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          outline: 'none',
+        }}
+      />
+      <button onClick={handleSearch} style={{
+        padding: '8px 16px',
+        borderRadius: '4px',
+        backgroundColor: '#007bff',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      }}>Search</button>
+    </div>
+      <h3 style={{textAlign:'center'}}>All Projects that are available currently</h3>
      {arrayofprojects.map((item)=>{
-      return(<div style={{ 
+      return(
+      <div style={{ 
         border: '1px solid #ccc',
         borderRadius: '5px',
         padding: '10px',
         maxWidth: '200px',
         margin: '0 auto',
         textAlign:'center'
-
       }}>
-        <h2 style={{ fontSize: '24px' }}>{item.data.Title}</h2>
-        <p>{item.data.Des}</p>
-        <p>{item.data.Skills}</p>
+        <h2 style={{ fontSize: '24px' }}>{item.data.Title}</h2><br/>
+        {/* <p>{item.data.Des}</p> */}
+        <Skills skills={item.data.Skills}/>
         <p>{item.data.uploadedBy}</p>
         <p>{item.data.Category}</p>
         <p>{item.data.Subcategory}</p>
@@ -73,8 +148,8 @@ export default function Home({arrayofprojects}) {
             router.push({pathname:'/apply',query:{proid:item.id,uid:id,clientid:item.data.uid}})
           
         }}>Apply</button>}
-        
-      </div>)
+        </div>
+      )
   
      })}
      <RegisterPopup isOpen={isOpen} setSignUp={setSignUp} isSignup={isSignup} setOpen={setOpen} button={button} setButton={setButton} setId={setId}/>
@@ -412,7 +487,71 @@ signInWithEmailAndPassword(auth, email, password)
     </div>
   );
 };
-
+const NavigationDrawer = ({ isOpen, onClose }) => {
+  return (
+    <Drawer anchor="left" open={isOpen} onClose={onClose}>
+      <Box sx={{ width: 250 }} role="presentation" onClick={onClose} onKeyDown={onClose}>
+        <List>
+          <ListItem>
+            <Avatar />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="John Doe" />
+          </ListItem>
+          <Divider />
+          <ListSubheader>Navigation</ListSubheader>
+          <ListItem button>
+            <ListItemIcon>
+              <DashboardIcon />
+            </ListItemIcon>
+            <ListItemText primary="Dashboard" />
+          </ListItem>
+          <ListItem button>
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Settings" />
+          </ListItem>
+          <Divider />
+          <ListSubheader>Account</ListSubheader>
+          <ListItem button>
+            <ListItemIcon>
+              <AccountBox/>
+            </ListItemIcon>
+            <ListItemText primary="Sign in" />
+          </ListItem>
+          <ListItem button>
+            <ListItemIcon>
+              <PersonAdd/>
+            </ListItemIcon>
+            <ListItemText primary="Sign up" />
+          </ListItem>
+        </List>
+      </Box>
+    </Drawer>
+  );
+};
+const Skills = ({ skills }) => {
+  return (
+    <div>
+      {skills.split(",").map((skill) => (
+        <span
+          key={skill}
+          style={{
+            display: "inline-block",
+            background: "#ccc",
+            color: "#fff",
+            padding: "0.2rem 0.5rem",
+            margin: "0.2rem",
+            borderRadius: "5px",
+          }}
+        >
+          {skill}
+        </span>
+      ))}
+    </div>
+  );
+};
 
 export async function getServerSideProps(context) {
   let arrayofprojects=[]

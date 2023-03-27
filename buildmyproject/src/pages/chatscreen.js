@@ -7,8 +7,10 @@ import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc,query,where,orderBy, serverTimestamp} from "firebase/firestore"
 import { async } from '@firebase/util'
 import { onSnapshot } from 'firebase/firestore'
+
 //import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
 import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
+import Link from 'next/link'
 
 export default function ChatScreen({clientId,UserId}) {
   const db=getFirestore(app);
@@ -46,13 +48,14 @@ export default function ChatScreen({clientId,UserId}) {
     }, [clientId, UserId]);
   
     const sendMessage = () => {
-      db.collection('messages').add({
-        users: [clientId.uid, recipientUser.uid].sort(),
+      const messRef=collection(db,"messages");
+      addDoc(messRef,{
+        users: [clientId, UserId].sort(),
         sender: clientId,
         recipient: UserId,
         message,
         timestamp: serverTimestamp(),
-      });
+      })
       setMessage('');
     };
    
@@ -104,9 +107,14 @@ export default function ChatScreen({clientId,UserId}) {
       <li key={i} style={{ 
         listStyleType: 'none', 
         padding: '0.5rem 1rem', 
+       
         textAlign: msg.sender === UserId ? 'right' : 'left' 
       }}>
-        <strong>{msg.sender === UserId ? 'You' : clientId}:</strong> {msg.message}
+       
+        <strong
+        
+        >{msg.sender === UserId ? 'You' : userName}:</strong>  <div  style={{background:'#E6F0F3',padding:'20px',borderRadius:'10px'}}   >{msg.message}
+        </div>
       </li>
     ))}
   </ul>
@@ -116,6 +124,7 @@ export default function ChatScreen({clientId,UserId}) {
     padding: '1rem', 
     borderTop: '1px solid #ccc' 
   }}>
+   <Link href="https://paytm.me/e6WB-zQ">Pay to Student</Link>
     <input type="text" value={message} onChange={e => setMessage(e.target.value)} style={{ 
       flex: 1, 
       marginRight: '0.5rem', 
@@ -136,6 +145,12 @@ export default function ChatScreen({clientId,UserId}) {
     </>
   )
 }
+
+
+
+
+
+
 export async function getServerSideProps({ query}) {
   const clientId = query.clienttId;
   const UserId = query.Userid;
