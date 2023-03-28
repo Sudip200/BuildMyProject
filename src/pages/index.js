@@ -36,7 +36,19 @@ export default function Home({arrayofprojects}) {
     const [id,setId]=useState('')
     const [searchQuery, setSearchQuery] = useState('');
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
-    
+    const [filteredProjects, setFilteredProjects] = useState([]);
+
+    useEffect(() => {
+      if (searchQuery.trim() === '') {
+        setFilteredProjects(arrayofprojects);
+      } else {
+        const filtered = arrayofprojects.filter((project) =>
+          project.data.Title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.data.Category.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredProjects(filtered);
+      }
+    }, [searchQuery, arrayofprojects]);
     const handleToggleDrawer = () => {
       setIsDrawerOpen(!isDrawerOpen);
     };
@@ -64,49 +76,56 @@ export default function Home({arrayofprojects}) {
       
       <div style={{}}>
         
-      <div style={{ display: 'flex', justifyContent: 'center' ,padding:'40px',marginTop:'2%',gap:'6%'}}>
-      
-      <ListIcon
-      sx={{
-        width: '42px',
-        height: '42px',
-        '&:hover': {
-          cursor: 'pointer',
-        },
-        marginRight:'10%'
-      }}
-      onClick={handleToggleDrawer}
-    />
-    
-      <NavigationDrawer isOpen={isDrawerOpen} onClose={handleToggleDrawer} />
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchQuery}
-        onChange={handleInputChange}
-        style={{
-          padding: '8px',
-          borderRadius: '4px',
-          border: '1px solid #ccc',
-          marginRight: '8px',
-          width: '300px',
-          height:'30px',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-          outline: 'none',
-        }}
-      />
-      <button onClick={handleSearch} style={{
-        padding: '8px 16px',
-        borderRadius: '4px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        border: 'none',
+  
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '16px', gap: '16px', alignItems: 'center', backgroundColor: '#fff', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', borderRadius: '8px' }}>
+  <ListIcon
+    sx={{
+      width: '32px',
+      height: '32px',
+      '&:hover': {
         cursor: 'pointer',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      }}>Search</button>
-    </div>
+      },
+      color: '#007bff'
+    }}
+    onClick={handleToggleDrawer}
+  />
+  <input
+    type="text"
+    placeholder="Search..."
+    value={searchQuery}
+    onChange={handleInputChange}
+    style={{
+      padding: '8px',
+      borderRadius: '4px',
+      border: 'none',
+      width: '100%',
+      height: '40px',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+      outline: 'none',
+      backgroundColor: '#f8f8f8',
+      color: '#333',
+      fontSize: '16px',
+      fontFamily: 'inherit'
+    }}
+  />
+  <button onClick={handleSearch} style={{
+    padding: '12px 24px',
+    borderRadius: '4px',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    cursor: 'pointer',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    fontSize: '16px',
+    fontFamily: 'inherit',
+    fontWeight: 'bold'
+  }}>Search</button>
+  <NavigationDrawer isOpen={isDrawerOpen} onClose={handleToggleDrawer} />
+</div>
+
+
       <h3 style={{textAlign:'center'}}>All Projects that are available currently</h3>
-     {arrayofprojects.map((item)=>{
+     {filteredProjects.map((item)=>{
       return(
       <div style={{ 
         border: '1px solid #ccc',
@@ -123,21 +142,7 @@ export default function Home({arrayofprojects}) {
         <p>{item.data.Category}</p>
         <p>{item.data.Subcategory}</p>
         <h1 style={{color:'green'}}>rs.{item.data.Budget}</h1>
-        {button==='signup'?<button style={{ 
-          background: '#0070f3',
-          color: 'white',
-          padding: '10px',
-          borderRadius: '5px',
-          border: 'none',
-          cursor: 'pointer',
-          marginTop: '10px',
-          fontWeight: 'bold',
-          fontSize: '16px'
-        }}  onClick={()=>{
-            if(!isSignup){
-              setOpen(true)
-            }
-        }}>Sign Up</button>:<button style={{ 
+       <button style={{ 
           background: '#0070f3',
           color: 'white',
           padding: '10px',
@@ -149,9 +154,9 @@ export default function Home({arrayofprojects}) {
           fontSize: '16px'
         }}  onClick={()=>{
           
-            router.push({pathname:'/apply',query:{proid:item.id,uid:id,clientid:item.data.uid}})
+            router.push({pathname:'/projectdetails',query:{proid:item.id,uid:id,clientid:item.data.uid}})
           
-        }}>Apply</button>}
+        }}>Apply</button>
         </div>
       )
   
@@ -494,6 +499,7 @@ signInWithEmailAndPassword(auth, email, password)
 const NavigationDrawer = ({ isOpen, onClose }) => {
   return (
     <Drawer anchor="left" open={isOpen} onClose={onClose}>
+      
       <Box sx={{ width: 250 }} role="presentation" onClick={onClose} onKeyDown={onClose}>
         <List>
           <ListItem>
@@ -522,7 +528,8 @@ const NavigationDrawer = ({ isOpen, onClose }) => {
             <ListItemIcon>
               <AccountBox/>
             </ListItemIcon>
-            <ListItemText primary="Sign in" />
+            {/* <ListItemText primary="Sign in/Sing Up"   /> */}
+          <Link href='/clientregister'>Client Sign In</Link>
           </ListItem>
           <ListItem button>
             <ListItemIcon>

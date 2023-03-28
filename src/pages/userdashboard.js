@@ -10,19 +10,8 @@ import { onSnapshot } from 'firebase/firestore'
 //import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
 import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 import React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import { styled } from '@mui/system';
 import Script from 'next/script'
 
-const StyledButton = styled(Button)({
-  color: '#fff',
-  backgroundColor: '#007bff',
-  '&:hover': {
-    backgroundColor: '#0069d9',
-  },
-});
 export default function UserDashBoard() {
  
   return (
@@ -42,8 +31,6 @@ export default function UserDashBoard() {
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply as Mentor</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply for more Projects</div>
 <div  style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Get a Mentor for Projects</div>
-<div  style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Certificates</div>
-
     </div>
     </>
   )
