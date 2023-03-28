@@ -4,11 +4,18 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import app from '../firebase'
-export default function ProjectDetails({ project }) {
+export default function ProjectDetails({ project,uid,clientid }) {
   const router = useRouter()
 
   if (router.isFallback) {
     return <div>Loading...</div>
+  }
+  if(uid==='none'){
+
+    return(<div>Sign In first</div>)
+  
+
+     
   }
 
   return (
@@ -44,7 +51,7 @@ export default function ProjectDetails({ project }) {
     marginBottom: '20px',
   }}>
     <p style={{ fontSize: '18px', fontWeight: 'bold' }}>Category: {project.Category}</p>
-    <p style={{ fontSize: '18px', fontWeight: 'bold' }}>Subcategory: {project.Subcategory}</p>
+    <p style={{ fontSize: '18px', fontWeight: 'bold' }}>Subcategory: {project.SubCategory}</p>
   </div>
   <p style={{ 
     fontSize: '18px',
@@ -102,7 +109,7 @@ export default function ProjectDetails({ project }) {
 }
 
 export async function getServerSideProps(context) {
-  const { proid } = context.query
+  const { proid,uid,clientid } = context.query
   const db = getFirestore(app)
   const projectDoc = doc(db, 'AllProjects', proid)
   const projectData = await getDoc(projectDoc)
@@ -111,6 +118,8 @@ export async function getServerSideProps(context) {
   return {
     props: {
       project,
+      uid:uid?uid:'none',
+      clientid
     },
   }
 }

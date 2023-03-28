@@ -12,8 +12,16 @@ import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 import React from 'react';
 import Script from 'next/script'
 
-export default function UserDashBoard() {
- 
+import { makeStyles } from '@mui/styles'
+import { Typography, Grid, Box } from '@mui/material';
+import { AccountBalanceWallet, Chat, Star, Group, PersonAdd, Person } from '@mui/icons-material';
+
+
+
+export default function UserDashBoard({user}) {
+ const db=getFirestore()
+
+
   return (
     <>
       <Head>
@@ -25,23 +33,28 @@ export default function UserDashBoard() {
       </Head>
      
     <div className="flex wrap bg-blue" style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:'20px'}}>
+      <h2>Welcome {user.name} </h2>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px',maxWidth:'300px'}}>Total Earnings</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>All Chats</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}} >Saved Projects</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply as Mentor</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply for more Projects</div>
 <div  style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Get a Mentor for Projects</div>
-    </div>
+    </div> 
+   
     </>
   )
 }
-// export async function getServerSideProps({ query}) {
-//   const clientId = query.clienttId;
-//   const UserId = query.Userid;
-//     return {
-//       props: {
-//         clientId,
-//        UserId
-//       }
-//     }
-//   }
+export async function getServerSideProps(context) {
+  const { uid } = context.query;
+  const db = getFirestore();
+  const userDocRef = doc(db, 'Users', uid);
+  const userDocSnapshot = await getDoc(userDocRef);
+  const user = userDocSnapshot.data();
+
+  return {
+    props: {
+      user,
+    },
+  };
+}

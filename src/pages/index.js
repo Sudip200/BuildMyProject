@@ -140,7 +140,7 @@ export default function Home({arrayofprojects}) {
         <Skills skills={item.data.Skills}/>
         <p>{item.data.uploadedBy}</p>
         <p>{item.data.Category}</p>
-        <p>{item.data.Subcategory}</p>
+        <p>{item.data.SubCategory}</p>
         <h1 style={{color:'green'}}>rs.{item.data.Budget}</h1>
        <button style={{ 
           background: '#0070f3',
@@ -154,7 +154,7 @@ export default function Home({arrayofprojects}) {
           fontSize: '16px'
         }}  onClick={()=>{
           
-            router.push({pathname:'/projectdetails',query:{proid:item.id,clientid:item.data.uid}})
+            router.push({pathname:'/projectdetails',query:{proid:item.id,uid:id,clientid:item.data.uid}})
           
         }}>Apply</button>
         </div>
@@ -175,29 +175,6 @@ const RegisterPopup = ({ isOpen, onClose ,isSignup,setSignUp,setOpen,button,setB
   const db=getFirestore(app)
   const provider = new GoogleAuthProvider();
   const auth = getAuth();
-  // const handleSubmitSignUp = (event) => {
-  //   event.preventDefault();
-
-  //   // TODO: Add code to register the student with the provided details
-  //   console.log('Name:', name);
-  //   console.log('Email:', email);
-  //   console.log('Password:', password);
-   
-  //  const docRef=collection(db,"Users");
-  //  addDoc(docRef,{
-  //   name:name,
-  //   email:email,
-  //   password:password
-  //  }).then((res)=>{
-  //   alert("Registration successful");
-  //   setSignUp(true)
-  //   setOpen(false)
-  //  }).catch((err)=>{
-  //   alert("Can not register some error occurred");
-  //  })
-    
-    
-  // };
   const handleLogin=(event)=>{
    
   const auth = getAuth();
@@ -535,7 +512,7 @@ const NavigationDrawer = ({ isOpen, onClose }) => {
             <ListItemIcon>
               <PersonAdd/>
             </ListItemIcon>
-            <ListItemText primary="Sign up" />
+            <Link href='/useregister'>Freelancer Sign In</Link>
           </ListItem>
         </List>
       </Box>
