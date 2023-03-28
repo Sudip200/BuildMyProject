@@ -154,7 +154,7 @@ export default function Home({arrayofprojects}) {
           fontSize: '16px'
         }}  onClick={()=>{
           
-            router.push({pathname:'/projectdetails',query:{proid:item.id,uid:id,clientid:item.data.uid}})
+            router.push({pathname:'/projectdetails',query:{proid:item.id,clientid:item.data.uid}})
           
         }}>Apply</button>
         </div>
