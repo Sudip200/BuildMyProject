@@ -15,13 +15,33 @@ import Script from 'next/script'
 import { makeStyles } from '@mui/styles'
 import { Typography, Grid, Box } from '@mui/material';
 import { AccountBalanceWallet, Chat, Star, Group, PersonAdd, Person } from '@mui/icons-material';
-
+import { getAuth, onAuthStateChanged,setPersistence,browserLocalPersistence ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword} from "firebase/auth";
+import { useRouter } from 'next/router'
 
 
 export default function UserDashBoard({user}) {
- const db=getFirestore()
+ // const [user, setUser] = useState(null);
+const router=useRouter()
+ const db=getFirestore(app)
 
+// useEffect(() => {
+//   const auth = getAuth();
+//   const unsubscribe = onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//       setUser({
+//         displayName: user.displayName,
+//         email: user.email,
+//         photoURL: user.photoURL,
+//         uid: user.uid,
+//       });
+//     } else {
+//       setUser(null);
+//     }
+//   });
 
+//   return unsubscribe;
+// }, []);
+// console.log(user)
   return (
     <>
       <Head>
@@ -35,7 +55,7 @@ export default function UserDashBoard({user}) {
     <div className="flex wrap bg-blue" style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:'20px'}}>
       <h2>Welcome {user.name} </h2>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px',maxWidth:'300px'}}>Total Earnings</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>All Chats</div>
+<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}  onClick={()=>{router.push({pathname:'/allchats',query:{Userid:user.uid}})}}    >All Chats</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}} >Saved Projects</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply as Mentor</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply for more Projects</div>
@@ -47,14 +67,14 @@ export default function UserDashBoard({user}) {
 }
 export async function getServerSideProps(context) {
   const { uid } = context.query;
-  const db = getFirestore();
+  const db = getFirestore(app);
   const userDocRef = doc(db, 'Users', uid);
   const userDocSnapshot = await getDoc(userDocRef);
   const user = userDocSnapshot.data();
 
   return {
     props: {
-      user,
+      user:user?user:'none',
     },
   };
 }

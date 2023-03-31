@@ -7,7 +7,7 @@ import app from '../firebase'
 
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc} from "firebase/firestore"
 import { async } from '@firebase/util'
-import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword} from "firebase/auth";
+import { getAuth, onAuthStateChanged,setPersistence,browserLocalPersistence ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword} from "firebase/auth";
 
 export default function UserRegistration({ project,uid,clientid }) {
     const [name, setName] = useState('');
@@ -22,7 +22,7 @@ export default function UserRegistration({ project,uid,clientid }) {
     const handleLogin=(event)=>{
      
     const auth = getAuth();
-    signInWithPopup(auth, provider)
+     signInWithPopup(auth, provider)
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
@@ -37,6 +37,13 @@ export default function UserRegistration({ project,uid,clientid }) {
        console.log(res)
      
       setId(user.uid)
+      setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        localStorage.setItem('authToken', user.accessToken);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
      }).catch((err)=>{
       console.log(err)
      })
@@ -68,7 +75,7 @@ export default function UserRegistration({ project,uid,clientid }) {
        pic:user.photoURL
       }).then((res)=>{
        console.log(res)
-     
+       localStorage.setItem('uid',res.uid)
         setId(res.uid)
       }).catch((err)=>{
        console.log(err)
@@ -89,9 +96,10 @@ export default function UserRegistration({ project,uid,clientid }) {
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
-      
+     
       setId(user.uid)
       console.log(id)
+      
      router.push({pathname:'/userdashboard',query: {uid:user.uid}})
     })
     .catch((error) => {

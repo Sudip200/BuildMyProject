@@ -28,16 +28,17 @@ import Link from 'next/link'
 import Script from 'next/script'
 
 
-export default function Home({arrayofprojects}) {
+export default function Home({arrayofprojects,user}) {
    const [isSignup,setSignUp]=useState(false);
    const [isOpen,setOpen]=useState(false);
     const router=useRouter()
     const [button,setButton]=useState('signup')
     const [id,setId]=useState('')
     const [searchQuery, setSearchQuery] = useState('');
+    const [isLoggin,setIsLoggedin]=useState(false)
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const [filteredProjects, setFilteredProjects] = useState([]);
-
+   
     useEffect(() => {
       if (searchQuery.trim() === '') {
         setFilteredProjects(arrayofprojects);
@@ -120,7 +121,7 @@ export default function Home({arrayofprojects}) {
     fontFamily: 'inherit',
     fontWeight: 'bold'
   }}>Search</button>
-  <NavigationDrawer isOpen={isDrawerOpen} onClose={handleToggleDrawer} />
+  <NavigationDrawer isOpen={isDrawerOpen} onClose={handleToggleDrawer} isLoggin={isLoggin} uid={user} />
 </div>
 
 
@@ -473,7 +474,8 @@ signInWithEmailAndPassword(auth, email, password)
     </div>
   );
 };
-const NavigationDrawer = ({ isOpen, onClose }) => {
+const NavigationDrawer = ({ isOpen, onClose,isLoggin,uid }) => {
+  const router=useRouter()
   return (
     <Drawer anchor="left" open={isOpen} onClose={onClose}>
       
@@ -491,7 +493,9 @@ const NavigationDrawer = ({ isOpen, onClose }) => {
             <ListItemIcon>
               <DashboardIcon />
             </ListItemIcon>
-            <ListItemText primary="Dashboard" />
+            <ListItemText primary="Dashboard" onClick={()=>{
+              router.push({pathname:'/userdashboard',query:{uid:uid.uid}})
+            }} />
           </ListItem>
           <ListItem button>
             <ListItemIcon>
@@ -542,8 +546,17 @@ const Skills = ({ skills }) => {
 };
 
 export async function getServerSideProps(context) {
+  const {uid}=context.query
+  const db = getFirestore(app);
+  let user
+  if(uid){
+    const userDocRef = doc(db, 'Users', uid);
+    const userDocSnapshot = await getDoc(userDocRef);
+     user = userDocSnapshot.data();
+  }
+  
   let arrayofprojects=[]
- const db= getFirestore(app);
+ 
  const ref=collection(db,"AllProjects");
  const docRef= await getDocs(ref);
  docRef.forEach((doc) => { 
@@ -553,7 +566,8 @@ export async function getServerSideProps(context) {
 console.log(arrayofprojects)
   return {
     props: {
-      arrayofprojects 
+      arrayofprojects ,
+      user:user?user:'none',
     },
   };
 }

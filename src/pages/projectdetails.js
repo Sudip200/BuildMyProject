@@ -4,19 +4,13 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import app from '../firebase'
-export default function ProjectDetails({ project,uid,clientid }) {
+export default function ProjectDetails({ project,uid,clientid ,proid}) {
   const router = useRouter()
 
   if (router.isFallback) {
     return <div>Loading...</div>
   }
-  if(uid==='none'){
-
-    return(<div>Sign In first</div>)
-  
-
-     
-  }
+ 
 
   return (
     <>
@@ -101,7 +95,7 @@ export default function ProjectDetails({ project,uid,clientid }) {
     cursor: 'pointer',
     fontWeight: 'bold',
     fontSize: '18px',
-  }}>Apply</button>
+  }}   onClick={()=>router.push({pathname:'/apply',query:{clientid,proid,uid}})}     >Apply</button>
 </div>
 
     </>
@@ -119,7 +113,8 @@ export async function getServerSideProps(context) {
     props: {
       project,
       uid:uid?uid:'none',
-      clientid
+      clientid,
+      proid
     },
   }
 }

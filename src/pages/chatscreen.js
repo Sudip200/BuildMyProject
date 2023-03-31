@@ -23,13 +23,15 @@ export default function ChatScreen({clientId,UserId}) {
     useEffect(() => {
  
       const userref=doc(db,"Users",UserId);
-      const clientref=doc(db,"Users",clientId);
+      const clientref=doc(db,"clients",clientId);
   getDoc(userref).then((res)=>{
     setU(res.data().name)
   })
+
   getDoc(clientref).then((res)=>{
     setC(res.data().name)
   })
+    
 
       const messagesQuery = query(
         collection(db, 'messages'),
@@ -52,8 +54,8 @@ export default function ChatScreen({clientId,UserId}) {
       const messRef=collection(db,"messages");
       addDoc(messRef,{
         users: [clientId, UserId].sort(),
-        sender: clientId,
-        recipient: UserId,
+        sender:UserId,
+        recipient: clientId,
         message,
         timestamp: serverTimestamp(),
       })
@@ -70,22 +72,7 @@ export default function ChatScreen({clientId,UserId}) {
         <link rel="icon" href="/favicon.ico" />
      
       </Head>
-     {/* <div>
-     <div>
-      <h2>Chatting with {clientName}</h2>
-      <ul>
-        {messages.map((msg, i) => (
-          <li key={i}>
-            <strong>{msg.sender === UserId ? 'You' : clientId}:</strong> {msg.message}
-          </li>
-        ))}
-      </ul>
-      <div>
-        <input type="text" value={message} onChange={e => setMessage(e.target.value)} />
-        <button onClick={sendMessage}>Send</button>
-      </div>
-    </div>
-</div> */}
+
 <div style={{ 
   display: 'flex', 
   flexDirection: 'column', 
@@ -159,7 +146,7 @@ export async function getServerSideProps({ query}) {
     return {
       props: {
         clientId,
-       UserId
+        UserId
       }
     }
   }
