@@ -3,26 +3,23 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-
-export default function UserDashboard() {
+import app from '../firebase';
+export default function PostProject({clientId}) {
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [projectCategory, setProjectCategory] = useState("");
   const [projectSubcategory, setProjectSubcategory] = useState("");
   const [budget, setBudget] = useState("");
-
+const [skills,setSkills]=useState("")
+const [clientname,setClientName]=useState("")
   const router = useRouter();
   const auth = getAuth();
-
-  useEffect(() => {
-    if (!auth.currentUser) {
-      router.push("/");
-    }
-  }, [auth.currentUser, router]);
+  const db = getFirestore(app);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const db = getFirestore();
+  
     const uid = auth.currentUser.uid;
     const projectData = {
       projectTitle,
@@ -34,13 +31,23 @@ export default function UserDashboard() {
       uid
     };
     try {
-      await addDoc(collection(db, "allProjects"), projectData);
+      await addDoc(collection(db, "AllProjects"), {
+        Title:projectTitle,
+        Budget:budget,
+        Category:projectCategory,
+        SubCategory:projectSubcategory,
+      uid:clientId,
+      uploadedBy:clientname,
+      Skills:skills,
+      Des:projectDescription,
+      });
       alert("Project added successfully!");
       setProjectTitle("");
       setProjectDescription("");
       setProjectCategory("");
       setProjectSubcategory("");
       setBudget("");
+      router.push({pathname:'/clientdashboard',query:{clientId:clientId}})
     } catch (err) {
       console.log(err);
       alert("Error adding project.");
@@ -117,6 +124,24 @@ export default function UserDashboard() {
               />
               </label>
               <label>
+            Project skills separated by comma:
+            <input
+              type="text"
+              placeholder="Enter project skills"
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+              />
+              </label>
+              <label>
+           Enter Your Name
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={clientname}
+              onChange={(e) => setClientName(e.target.value)}
+              />
+              </label>
+              <label>
               Budget:
               <input
               type="number"
@@ -125,6 +150,7 @@ export default function UserDashboard() {
               onChange={(e) => setBudget(e.target.value)}
               />
               </label>
+
               <input type="submit" value="Submit" />
               </form>
               </div>
@@ -134,7 +160,9 @@ export default function UserDashboard() {
               
               export async function getServerSideProps({ query }) {
               // Here you can add any server-side code you need
-              return { props: {} };
+              const clientId=query.clientId
+
+              return { props: {clientId} };
               }
               
               

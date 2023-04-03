@@ -58,7 +58,11 @@ const router=useRouter()
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}  onClick={()=>{router.push({pathname:'/allchats',query:{Userid:user.uid}})}}    >All Chats</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}} >Saved Projects</div>
 <div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply as Mentor</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply for more Projects</div>
+<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}
+onClick={()=>{
+  router.push({pathname:'/',query:{uid:user.uid}})
+}}
+>Apply for more Projects</div>
 <div  style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Get a Mentor for Projects</div>
     </div> 
    

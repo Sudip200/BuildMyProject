@@ -11,9 +11,11 @@ import { onSnapshot } from 'firebase/firestore'
 import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 import React from 'react';
 import Script from 'next/script'
+import { useRouter } from 'next/router'
 
-export default function ClientDashBoard() {
- 
+export default function ClientDashBoard({clientId,projects}) {
+ const router=useRouter()
+ console.log(projects)
   return (
     <>
       <Head>
@@ -25,22 +27,47 @@ export default function ClientDashBoard() {
       </Head>
      
     <div className="flex wrap bg-blue" style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:'20px'}}>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px',maxWidth:'300px'}}>Total Earnings</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>All Jobs Posted</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}} >All Chats</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Post New Project</div>
 
+
+<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}} onClick={()=>{
+   router.push({pathname:'/allchats',query:{UserId:clientId}})
+}} >All Chats</div>
+<button style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}    onClick={()=>{
+ 
+  router.push({pathname:'/postproject',query:{clientId:clientId}})}}         >Post New Project</button>
+
+    </div>
+    <div style={{}}>
+      <h3>All Jobs Posted</h3>
+{projects.map((item)=>{
+return (<div>
+  <h2>{item.data.Title}</h2>
+  </div>)})}
     </div>
     </>
   )
 }
-// export async function getServerSideProps({ query}) {
-//   const clientId = query.clienttId;
-//   const UserId = query.Userid;
-//     return {
-//       props: {
-//         clientId,
-//        UserId
-//       }
-//     }
-//   }
+export async function getServerSideProps({ query}) {
+  const clientId = query.clientId;
+   const db=getFirestore(app);
+   const docRef=collection(db,"AllProjects")
+   let projects=[]
+   const snapShot=await getDocs(docRef)
+ 
+   snapShot.forEach((item)=>{
+    console.log(item.id)
+    if(item.data().uid===clientId){
+      projects.push({id:item.id,data:item.data()})
+    }
+   })
+
+
+
+
+    return {
+props: {
+       clientId,
+    projects:projects
+     }
+   }
+  }

@@ -12,10 +12,12 @@ import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthP
 import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 import React from 'react';
 import Script from 'next/script'
+import { useRouter } from 'next/router'
 
 export default function ClientRegistration() {
  const [route,setRoute]=useState('log');
  const [name, setName] = useState('');
+ const router=useRouter()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [id,setId]=useState('');
@@ -40,8 +42,10 @@ export default function ClientRegistration() {
          }).then((res)=>{
            console.log(res)
           setId(user.uid)
+          router.push({pathname:'/clientdashboard',query:{clientId:user.uid}})
          }).catch((err)=>{
           console.log(err)
+          alert(err)
          })
            
           }).catch((error) => {
@@ -71,10 +75,11 @@ export default function ClientRegistration() {
            pic:user.photoURL
           }).then((res)=>{
            console.log(res)
-         
+          router.push({pathname:'/clientdashboard',query:{clientId:user.uid}})
             setId(res.uid)
           }).catch((err)=>{
            console.log(err)
+           alert(err)
           })
       
         })
@@ -94,7 +99,8 @@ export default function ClientRegistration() {
           const user = userCredential.user;
           // ...
           setId(user.uid)
-      
+          router.push({pathname:'/clientdashboard',query:{clientId:user.uid}})
+         
         })
         .catch((error) => {
           const errorCode = error.code;

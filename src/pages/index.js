@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google'
 import {  useState ,useEffect} from 'react'
 import styles from '@/styles/Home.module.css'
 import app from "../firebase"
-import {collection,doc,setDoc,getDocs,getFirestore,addDoc} from "firebase/firestore"
+import {collection,doc,setDoc,getDocs,getFirestore,addDoc,getDoc} from "firebase/firestore"
 import { async } from '@firebase/util'
 import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,signInWithEmailAndPassword} from "firebase/auth";
 import { useRouter } from 'next/router'
@@ -155,14 +155,14 @@ export default function Home({arrayofprojects,user}) {
           fontSize: '16px'
         }}  onClick={()=>{
           
-            router.push({pathname:'/projectdetails',query:{proid:item.id,uid:id,clientid:item.data.uid}})
+            router.push({pathname:'/projectdetails',query:{proid:item.id,uid:user.uid,clientid:item.data.uid}})
           
         }}>Apply</button>
         </div>
       )
   
      })}
-     <RegisterPopup isOpen={isOpen} setSignUp={setSignUp} isSignup={isSignup} setOpen={setOpen} button={button} setButton={setButton} setId={setId}/>
+    
 
       </div>
     </>
@@ -560,7 +560,7 @@ export async function getServerSideProps(context) {
  const ref=collection(db,"AllProjects");
  const docRef= await getDocs(ref);
  docRef.forEach((doc) => { 
-  // console.log(`${doc.id} => ${JSON.stringify(doc.data())}`); 
+  
   arrayofprojects.push({id:doc.id ,data:doc.data()})
 });
 console.log(arrayofprojects)
