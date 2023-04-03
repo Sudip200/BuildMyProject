@@ -42,6 +42,9 @@ export default function ClientDashBoard({clientId,projects}) {
 {projects.map((item)=>{
 return (<div>
   <h2>{item.data.Title}</h2>
+  {item.proposals.map((item)=>{
+    <h2>{item.data.email}</h2>
+  })}
   </div>)})}
     </div>
     </>
@@ -51,18 +54,28 @@ export async function getServerSideProps({ query}) {
   const clientId = query.clientId;
    const db=getFirestore(app);
    const docRef=collection(db,"AllProjects")
+   const allproposals=collection(db,"Proposals");
    let projects=[]
+   let proposals=[]
    const snapShot=await getDocs(docRef)
- 
+   const propsnapshot=await getDocs(allproposals)
    snapShot.forEach((item)=>{
-    console.log(item.id)
+    
     if(item.data().uid===clientId){
-      projects.push({id:item.id,data:item.data()})
+      console.log(item.data())
+      propsnapshot.forEach((doc)=>{
+        if(doc.data().projectid===item.id){
+          proposals.push({id:doc.id,data:doc.data()})
+         console.log(doc.data())
+          //projects.push({id:item.id,data:item.data()})
+        }
+      })
+      
     }
    })
 
-
-
+console.log(projects)
+console.log(proposals)
 
     return {
 props: {

@@ -126,6 +126,7 @@ export default function Home({arrayofprojects,user}) {
 
 
       <h3 style={{textAlign:'center'}}>All Projects that are available currently</h3>
+      
      {filteredProjects.map((item)=>{
       return(
       <div style={{ 
@@ -134,7 +135,8 @@ export default function Home({arrayofprojects,user}) {
         padding: '10px',
         maxWidth: '200px',
         margin: '0 auto',
-        textAlign:'center'
+        textAlign:'center',
+        
       }}>
         <h2 style={{ fontSize: '24px' }}>{item.data.Title}</h2><br/>
         {/* <p>{item.data.Des}</p> */}

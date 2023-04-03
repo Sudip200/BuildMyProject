@@ -27,7 +27,7 @@ export default function AllChat({ chats }) {
         {chats.map(chat => (
           <div key={chat.id} style={{ backgroundColor: 'white', padding: '1rem', marginBottom: '1rem', borderRadius: '0.5rem' }} onClick={()=>{ router.push({pathname:'/chatscreen',query:{clienttId:chat.recipient, Userid:chat.sender}})}}   >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span style={{ fontWeight: 'bold' }}>{chat.senderName}</span>
+              <span style={{ fontWeight: 'bold' }}>{chat.name}</span>
               <span style={{ fontSize: '0.75rem', color: '#666' }}>{new Date(chat.timestamp).toLocaleString()}</span>
             </div>
             <div>{chat.message}</div>
@@ -40,31 +40,63 @@ export default function AllChat({ chats }) {
 
 export async function getServerSideProps(context) {
   const dbQuery=context.query
-  const UserId = dbQuery.Userid;
+  const UserId = dbQuery.UserId;
+  const isclient=dbQuery.isclient;
   const db = getFirestore(app) // get your Firestore database instance
 
   const messagesRef = collection(db, 'messages');
-  //const q = query(messagesRef, where('users', 'array-contains', UserId));
-  //console.log(messagesRef)
+  const userDoc=collection(db,"Users");
+  const clientDoc=collection(db,"clients");
+  const snap1=await getDocs(userDoc);
   const querySnapshot = await getDocs(messagesRef);
-//console.log("ll",querySnapshot)
+
   const chats = [];
   querySnapshot.forEach((doc) => {
-   // console.log(doc.data().sender)
- if(doc.data().sender===UserId  ){
-  const chat={
-    id: doc.id,
-    ...doc.data(),
-  }
-  chat.timestamp = JSON.stringify(chat.timestamp)
-  //new Date(chat.timestamp.seconds * 1000).toISOString();
+   console.log(UserId)
+   if(isclient){
+    if(doc.data().recipient===UserId ){
+          snap1.forEach((item)=>{
+            if(item.id===doc.data().sender){
+              const chat={
+                name:item.data().name,
+                id: doc.id,
+                ...doc.data(),
+              }
+              chat.timestamp = JSON.stringify(chat.timestamp)
+              chats.push(chat);
+              
+            
+            
+            
+             
+
+
+
+
+
+
+
+            }
+          })
+   
+    
+     }
+   }
+//  if(doc.data().sender===UserId || doc.data().recipient===UserId ){
+ 
+//   const chat={
+//     id: doc.id,
+//     ...doc.data(),
+//   }
+//   chat.timestamp = JSON.stringify(chat.timestamp)
+
   
 
 
 
-  chats.push(chat);
+//   chats.push(chat);
 
- }
+//  }
   });
   console.log(chats)
 

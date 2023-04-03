@@ -61,6 +61,32 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       })
     }).catch(err=>alert(err));
    };
+   const handleSubmitProposal=(e)=>{
+    e.preventDefault()
+    const proRef=collection(db,"Proposal");
+    uploadBytes(storageRef, resume).then((snapshot) => {
+     console.log('Uploaded a blob or file!');
+     getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
+         addDoc(proRef,{
+            projectid:projectId,
+            uid:Uid,
+            name:name,
+            email:email,
+            proposal:proposal,
+            link:link,
+            resume:url
+          //  users: [clientid, Uid].sort(),
+          //  sender:Uid,
+          //  recipient: clientid,
+          //  message:`Hi My Name is ${name} email ${email} 
+          //  ${proposal} .My Url link ${link} .My Resume link ${url}`,
+          //  timestamp: serverTimestamp(),
+         }).then((res)=>{
+          router.push({pathname:'/userdashboard',query:{uid:Uid}})
+         }).catch(err=>alert(err));
+     })
+   }).catch(err=>alert(err));
+   }
   return (
     <>
       <Head>
