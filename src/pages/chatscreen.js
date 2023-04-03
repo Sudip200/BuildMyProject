@@ -84,7 +84,7 @@ export default function ChatScreen({clientId,UserId}) {
     backgroundColor: '#f0f0f0', 
     borderBottom: '1px solid #ccc' 
   }}>
-    <h2 style={{ margin: 0 }}>Chatting with {clientName}</h2>
+    <h2 style={{ margin: 0 }}>Chatting with {clientName} and </h2>
   </div>
   <ul style={{ 
     padding: 0, 
@@ -143,6 +143,8 @@ export default function ChatScreen({clientId,UserId}) {
 export async function getServerSideProps({ query}) {
   const clientId = query.clienttId;
   const UserId = query.Userid;
+  
+
     return {
       props: {
         clientId,

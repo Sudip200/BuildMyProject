@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import { useEffect, useParams, useState } from 'react'
-
+import Link from 'next/link'
 import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc, Timestamp, serverTimestamp} from "firebase/firestore"
 import { async } from '@firebase/util'
@@ -11,7 +11,7 @@ import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
 import { useRouter } from 'next/router'
 
 export default function ProposalSend({projectId,Uid,clientid}) {
-
+      
    const db=getFirestore(app)
    const storage = getStorage(app);
    const [name, setName] = useState("");
@@ -20,6 +20,10 @@ export default function ProposalSend({projectId,Uid,clientid}) {
    const [link, setLink] = useState("");
    const [resume, setResume] = useState(null);
   const router =useRouter()
+  if(Uid==='none'){
+    //  router.push({pathname:'/useregister'})   
+    return <div>Please log in first <Link href='/useregister'>Click Here</Link></div>
+  }
    const storageRef = ref(storage,`resumes/${resume}`);
    useEffect(()=>{
     const docRef=doc(db,"Users",Uid)
@@ -225,7 +229,7 @@ export async function getServerSideProps({ query}) {
     return {
       props: {
         projectId,
-        Uid,
+        Uid:Uid?Uid:'none',
          clientid
       }
     }
