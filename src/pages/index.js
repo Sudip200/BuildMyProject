@@ -565,7 +565,7 @@ export async function getServerSideProps(context) {
   
   arrayofprojects.push({id:doc.id ,data:doc.data()})
 });
-console.log(arrayofprojects)
+
   return {
     props: {
       arrayofprojects ,
