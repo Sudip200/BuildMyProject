@@ -31,7 +31,7 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       setEmail(res.data().email)
       setName(res.data().name)
     }).catch(err=>console.log(err))
-   },[])
+   },[db,Uid])
    
 
    const handleSubmit = (e) => {
@@ -42,13 +42,7 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       console.log('Uploaded a blob or file!');
       getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
           addDoc(proRef,{
-            // projectid:projectId,
-            // uid:Uid,
-            // name:name,
-            // email:email,
-            // proposal:proposal,
-            // link:link,
-            // resume:url
+          
             users: [clientid, Uid].sort(),
             sender:Uid,
             recipient: clientid,
@@ -108,7 +102,7 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
       backgroundColor: "#f7f7f7",
     }}
-    onSubmit={handleSubmit}
+    onSubmit={handleSubmitProposal}
   >
     <label
       htmlFor="name"

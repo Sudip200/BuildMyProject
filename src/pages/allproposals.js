@@ -13,9 +13,9 @@ import React from 'react';
 import Script from 'next/script'
 import { useRouter } from 'next/router'
 
-export default function ClientDashBoard({clientId,projects}) {
+export default function AllProposals({clientId,proposals,projectname}) {
  const router=useRouter()
- console.log(projects)
+ 
   return (
     <>
       <Head>
@@ -25,43 +25,27 @@ export default function ClientDashBoard({clientId,projects}) {
         <link rel="icon" href="/favicon.ico" />
        
       </Head>
-     
-    <div className="flex wrap bg-blue" style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:'20px'}}>
-
-
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}} onClick={()=>{
-   router.push({pathname:'/allchats',query:{UserId:clientId}})
-}} >All Chats</div>
-<button style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}    onClick={()=>{
- 
-  router.push({pathname:'/postproject',query:{clientId:clientId}})}}         >Post New Project</button>
-
-    </div>
-    <div style={{}}>
-      <h3>All Jobs Posted</h3>
-{projects.map((item)=>{
-return (<div  onClick={()=>{router.push({pathname:'/allproposals',query:{clientId:clientId,proid:item.id,projectname:item.data.Title}})}} key={item.id}>
-  <h2>{item.data.Title}</h2>
-  
-  </div>)})}
-    </div>
+     <h1> All Proposals for project {projectname}</h1>
+    
     </>
   )
 }
 export async function getServerSideProps({ query}) {
   const clientId = query.clientId;
+  const proid=query.proid;
+  const projectname=query.projectname
    const db=getFirestore(app);
-   const docRef=collection(db,"AllProjects")
+  // const docRef=collection(db,"AllProjects")
    const allproposals=collection(db,"Proposals");
-   let projects=[]
+ 
    let proposals=[]
-   const snapShot=await getDocs(docRef)
+ 
    const propsnapshot=await getDocs(allproposals)
-   snapShot.forEach((item)=>{
+   propsnapshot.forEach((item)=>{
     
-    if(item.data().uid===clientId){
+    if(item.data().projectid===proid){
    
-    projects.push({id:item.id,data:item.data()})
+    proposals.push({id:item.id,data:item.data()})
       
     }
    })
@@ -71,7 +55,8 @@ export async function getServerSideProps({ query}) {
     return {
 props: {
        clientId,
-    projects:projects
+    proposals:proposals,
+    projectname:projectname
      }
    }
   }

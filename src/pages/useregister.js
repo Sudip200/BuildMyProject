@@ -252,7 +252,7 @@ cursor: 'pointer'
       cursor: 'pointer'
 
     }}>
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" style={{ marginRight: '10px',width:'10px' }} />
+      <Image src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" width='10px' height='10px'/>
       Continue with Google
     </button>
   </div>

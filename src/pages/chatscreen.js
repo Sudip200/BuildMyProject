@@ -48,7 +48,7 @@ export default function ChatScreen({clientId,UserId}) {
         });
         setMessages(newMessages);
       });
-    }, [clientId, UserId]);
+    }, [clientId, UserId,db]);
   
     const sendMessage = () => {
       const messRef=collection(db,"messages");
