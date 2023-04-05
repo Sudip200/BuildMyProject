@@ -137,7 +137,7 @@ export default function Home({arrayofprojects,user}) {
         margin: '0 auto',
         textAlign:'center',
         
-      }}>
+      }}   key={item.id}     >
         <h2 style={{ fontSize: '24px' }}>{item.data.Title}</h2><br/>
         {/* <p>{item.data.Des}</p> */}
         <Skills skills={item.data.Skills}/>

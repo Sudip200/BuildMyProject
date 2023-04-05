@@ -38,100 +38,58 @@ export default function AllChat({ chats }) {
   )
 }
 
-export async function getServerSideProps(context) {
-  const dbQuery = context.query;
-  const userId = dbQuery.UserId;
-  const isClient = dbQuery.isclient;
-  const db = getFirestore(app); // get your Firestore database instance
-
-  const userDoc = collection(db, "Users");
-  const clientDoc = collection(db, "clients");
-  const userSnap = await getDocs(userDoc);
-  const messagesRef = collection(db, "messages");
-  const chatQuery = query(
-    messagesRef,
-    orderBy("timestamp", "desc"),
-    where("sender", "==", userId),
-    where("recipient", "==", isClient)
-  );
-
-  const chatSnapshot = await getDocs(chatQuery);
-
-  const chats = [];
-  chatSnapshot.forEach((doc) => {
-    userSnap.forEach((userDoc) => {
-      if (doc.data().recipient === userId) {
-        if (userDoc.id === doc.data().sender) {
-          const chat = {
-            name: userDoc.data().name,
-            id: doc.id,
-            ...doc.data(),
-          };
-          chat.timestamp = JSON.stringify(chat.timestamp);
-          chats.push(chat);
-        }
-      } else if (doc.data().sender === userId) {
-        if (userDoc.id === doc.data().recipient) {
-          const chat = {
-            name: userDoc.data().name,
-            id: doc.id,
-            ...doc.data(),
-          };
-          chat.timestamp = JSON.stringify(chat.timestamp);
-          chats.push(chat);
-        }
-      }
-    });
-  });
-
-  return {
-    props: {
-      chats: chats,
-    },
-  };
-}
-
-
-
-
-
-
-
-
-
-
-
 // export async function getServerSideProps(context) {
-//   const dbQuery=context.query
-//   const UserId = dbQuery.UserId;
-//   const isclient=dbQuery.isclient;
-//   const db = getFirestore(app) // get your Firestore database instance
+//   const dbQuery = context.query;
+//   const userId = dbQuery.UserId;
+//   const isClient = dbQuery.isclient;
+//   const db = getFirestore(app); // get your Firestore database instance
 
-//   const messagesRef = collection(db, 'messages');
-//   const userDoc=collection(db,"Users");
-//   const clientDoc=collection(db,"clients");
-//   const snap1=await getDocs(userDoc);
-//   const querySnapshot = await getDocs(messagesRef);
+//   const userDoc = collection(db, "Users");
+//   const clientDoc = collection(db, "clients");
+//   const userSnap = await getDocs(userDoc);
+//   const messagesRef = collection(db, "messages");
+//   const chatQuery = query(
+//     messagesRef,
+//     orderBy("timestamp", "desc"),
+//     where("sender", "==", userId),
+//     where("recipient", "==", isClient)
+//   );
+
+//   const chatSnapshot = await getDocs(chatQuery);
 
 //   const chats = [];
-//   querySnapshot.forEach((doc) => {
-//    console.log(UserId)
-//    if(isclient){
-//     if(doc.data().recipient===UserId ){
-//           snap1.forEach((item)=>{
-//             if(item.id===doc.data().sender){
-//               const chat={
-//                 name:item.data().name,
-//                 id: doc.id,
-//                 ...doc.data(),
-//               }
-//               chat.timestamp = JSON.stringify(chat.timestamp)
-//               chats.push(chat);
-              
-            
-            
-            
-             
+//   chatSnapshot.forEach((doc) => {
+//     userSnap.forEach((userDoc) => {
+//       if (doc.data().recipient === userId) {
+//         if (userDoc.id === doc.data().sender) {
+//           const chat = {
+//             name: userDoc.data().name,
+//             id: doc.id,
+//             ...doc.data(),
+//           };
+//           chat.timestamp = JSON.stringify(chat.timestamp);
+//           chats.push(chat);
+//         }
+//       } else if (doc.data().sender === userId) {
+//         if (userDoc.id === doc.data().recipient) {
+//           const chat = {
+//             name: userDoc.data().name,
+//             id: doc.id,
+//             ...doc.data(),
+//           };
+//           chat.timestamp = JSON.stringify(chat.timestamp);
+//           chats.push(chat);
+//         }
+//       }
+//     });
+//   });
+
+//   return {
+//     props: {
+//       chats: chats,
+//     },
+//   };
+// }
 
 
 
@@ -139,33 +97,48 @@ export async function getServerSideProps(context) {
 
 
 
-//             }
-//           })
+
+
+
+
+ export async function getServerSideProps(context) {
+ const dbQuery=context.query
+ const UserId = dbQuery.UserId;
+ const isclient=dbQuery.isclient;
+  const db = getFirestore(app) // get your Firestore database instance
+
+  const messagesRef = collection(db, 'messages');
+  const userDoc=collection(db,"Users");
+ const clientDoc=collection(db,"clients");
+  const snap1=await getDocs(userDoc);
+ const querySnapshot = await getDocs(messagesRef);
+
+ const chats = [];
+ querySnapshot.forEach((doc) => {
+   console.log(UserId)
+
    
-    
-//      }
-//    }
-// //  if(doc.data().sender===UserId || doc.data().recipient===UserId ){
+if(doc.data().sender===UserId || doc.data().recipient===UserId ){
  
-// //   const chat={
-// //     id: doc.id,
-// //     ...doc.data(),
-// //   }
-// //   chat.timestamp = JSON.stringify(chat.timestamp)
+ const chat={
+     id: doc.id,
+     ...doc.data(),
+  }
+  chat.timestamp = JSON.stringify(chat.timestamp)
 
   
 
 
 
-// //   chats.push(chat);
+   chats.push(chat);
 
-// //  }
-//   });
-//   console.log(chats)
+}
+  });
+ console.log(chats)
 
-//   return {
-//     props: {
-//       chats:chats,
-//     },
-//   };
-// }
+   return {
+     props: {
+           chats:chats,
+},
+   };
+ }
