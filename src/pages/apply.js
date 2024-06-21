@@ -25,15 +25,6 @@ export default function ProposalSend({projectId,Uid,clientid}) {
     return <div>Please log in first <Link href='/useregister'>Click Here</Link></div>
   }
    const storageRef = ref(storage,`resumes/${resume}`);
-  //  useEffect(()=>{
-  //   const docRef=doc(db,"Users",Uid)
-  //   getDoc(docRef).then((res)=>{
-  //     setEmail(res.data().email)
-  //     setName(res.data().name)
-  //   }).catch(err=>console.log(err))
-  //  },[db,Uid])
-   
-
    const handleSubmit = (e) => {
      e.preventDefault();
      // Do something with form data
@@ -242,14 +233,6 @@ export async function getServerSideProps({ query}) {
   const projectId = query.proid;
   const Uid = query.uid;
   const clientid=query.clientid;
-
-//  const doc= await getDoc(docRef).then((res)=>{
-//     setEmail(res.data().email)
-//     setName(res.data().name)
-//   }).catch(err=>console.log(err))
-   //const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
-   
-//   getDoc(docRef).then()
     return {
       props: {
         projectId,
