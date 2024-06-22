@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { useEffect, useParams, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc, Timestamp, serverTimestamp} from "firebase/firestore"
@@ -21,8 +21,7 @@ export default function ProposalSend({projectId,Uid,clientid}) {
    const [resume, setResume] = useState(null);
   const router =useRouter()
   if(Uid==='none'){
-    //  router.push({pathname:'/useregister'})   
-    return <div>Please log in first <Link href='/useregister'>Click Here</Link></div>
+     router.push({pathname:'/useregister'})   
   }
    const storageRef = ref(storage,`resumes/${resume}`);
    const handleSubmit = (e) => {
@@ -60,12 +59,6 @@ export default function ProposalSend({projectId,Uid,clientid}) {
             proposal:proposal,
             link:link,
             resume:url
-          //  users: [clientid, Uid].sort(),
-          //  sender:Uid,
-          //  recipient: clientid,
-          //  message:`Hi My Name is ${name} email ${email} 
-          //  ${proposal} .My Url link ${link} .My Resume link ${url}`,
-          //  timestamp: serverTimestamp(),
          }).then((res)=>{
           router.push({pathname:'/userdashboard',query:{uid:Uid}})
          }).catch(err=>alert(err));

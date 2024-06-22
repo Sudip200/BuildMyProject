@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, DocumentData } from 'firebase/firestore';
 import Image from 'next/image';
 import app from '../firebase';
 
@@ -40,7 +40,7 @@ export default function UserRegistration({ project, uid, clientid }) {
           setId(user.uid);
           setPersistence(auth, browserLocalPersistence)
             .then(() => {
-              localStorage.setItem('authToken', user.accessToken);
+              localStorage.setItem('authToken', token);
             })
             .catch((error) => {
               console.log(error);
@@ -67,9 +67,7 @@ export default function UserRegistration({ project, uid, clientid }) {
           uid: user.uid,
           pic: user.photoURL
         }).then((res) => {
-          console.log(res);
-          localStorage.setItem('uid', res.uid);
-          setId(res.uid);
+           router.push({ pathname: '/userdashboard' });
         }).catch((err) => {
           console.log(err);
         });
@@ -87,6 +85,7 @@ export default function UserRegistration({ project, uid, clientid }) {
       .then((userCredential) => {
         const user = userCredential.user;
         setId(user.uid);
+        router.push({ pathname: '/userdashboard' });
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -104,10 +103,10 @@ export default function UserRegistration({ project, uid, clientid }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-     <div>
+     <div className='flex justify-center items-center h-screen'>
     {
      r === true?(
-      <div className="flex flex-col items-center bg-gray-800 p-8 rounded-lg shadow-lg w-2/5  m-auto">
+      <div className="flex flex-col items-center bg-gray-800 p-8 rounded-lg shadow-lg w-70">
           <h2 className="mb-6 text-3xl text-violet-400 font-bold">Register Student</h2>
           <form onSubmit={handleSignUpWithEmail} className="w-full">
             <div className="mb-6">
@@ -127,7 +126,7 @@ export default function UserRegistration({ project, uid, clientid }) {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="p-3 rounded-md border border-gray-600 w-full bg-gray-700 text-white"
+                className ="p-3 rounded-md border border-gray-600 w-full bg-gray-700 text-white"
               />
             </div>
             <div className="mb-6">
@@ -140,16 +139,18 @@ export default function UserRegistration({ project, uid, clientid }) {
                 className="p-3 rounded-md border border-gray-600 w-full bg-gray-700 text-white"
               />
             </div>
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-md font-bold">Register</button>
+            <button type="submit" className="w-full bg-violet-900 hover:bg-blue-950 text-white p-3 rounded-md font-bold">Register</button>
           </form>
-          <button onClick={()=>{
-              setR(false)
-          }} className="mt-6 w-full bg-gray-700 text-gray-300 border border-gray-600 p-3 rounded-md flex items-center justify-center">
+          <button onClick={handleLogin} className="mt-6 w-full bg-gray-700 text-gray-300 border border-gray-600 p-3 rounded-md flex items-center justify-center">
+            <Image src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" width={20} height={20} />
+            <span className="ml-2">Continue with Google</span>
+          </button>
+          <button onClick={() => setR(false)} className="mt-6 w-ful text-violet-600">
             Login 
             </button>
         </div>
     ):
-       (<div className='m-auto w-2/5 flex items-center justify-center flex-col gap-4'>
+       (<div className='m-auto w-80 flex items-center justify-center flex-col gap-4 bg-gray-800 p-8 rounded'>
           <h2 className="mt-12 mb-6 text-3xl text-violet-400 font-bold">Login</h2>
           <form onSubmit={handleLoginWithEmail} className="w-full">
             <div className="mb-6">
@@ -172,13 +173,13 @@ export default function UserRegistration({ project, uid, clientid }) {
                 className="p-3 rounded-md border border-gray-600 w-full bg-gray-700 text-white"
               />
             </div>
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-md font-bold">Login</button>
+            <button type="submit" className="w-full bg-violet-900 hover:bg-violet-950 text-white p-3 rounded-md font-bold">Login</button>
           </form>
           <button onClick={handleLogin} className="mt-6 w-full bg-gray-700 text-gray-300 border border-gray-600 p-3 rounded-md flex items-center justify-center">
             <Image src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" width={20} height={20} />
             <span className="ml-2">Continue with Google</span>
           </button>
-          <button onClick={() => setR(true)} className="mt-6 w-full bg-gray-700 text-gray-300 border border-gray-600 p-3 rounded-md">Register</button>
+          <button onClick={() => setR(true)} className="mt-6 w-full text-violet-800 underline ">Register</button>
         
       </div>
        )

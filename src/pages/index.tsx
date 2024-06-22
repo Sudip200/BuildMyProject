@@ -13,44 +13,62 @@ import  AccountBox  from '@mui/icons-material/AccountBox'
 import { PersonAdd } from '@mui/icons-material'
 import ListSubheader from '@mui/material/ListSubheader'
 import ListIcon from '@mui/icons-material/List';
-import Drawer from '@mui/material/Drawer';
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import Avatar from '@mui/material/Avatar';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import SettingsIcon from '@mui/icons-material/Settings';
+import NavigationDrawer from '../components/navigation'
 import Link from 'next/link'
+import styles from '../styles/Home.module.css'
+import Filter from '../components/filter'
 import Script from 'next/script'
 import Card from '../components/projectcard'
 import DarkModeLayout from '../components/layout'
-let arrayofprojects:{id:any,data:any}[]=[];
 
-export default function Home({arrayofprojects, user}):ReactElement<any,any> {
-    const [isSignup,setSignUp]=useState(false);
+export default function Home({ arrayofprojects, user }: { arrayofprojects: { id: any, data: any }[], user: any }): ReactElement<any, any> {
+  const [isSignup, setSignUp] = useState(false);
     const [isOpen,setOpen]=useState(false);
     const router=useRouter()
     const [button,setButton]=useState('signup')
     const [id,setId]=useState('')
+    const [mincost,setminCost]=useState(0)
+    const [maxcost,setmaxCost]=useState(0)
     const [searchQuery, setSearchQuery] = useState('');
     const [isLoggin,setIsLoggedin]=useState(false)
+    const [categories,setCategories]=useState([])
+    const [selectedCategories,setSelectedCategories]=useState([])
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const [filteredProjects, setFilteredProjects] = useState([]);
    
+   const retriveCategories = ():void=>{
+    let catarr:string[]=[]
+    arrayofprojects.map((item)=>{
+      if(!catarr.includes(item.data.Category)){
+        catarr.push(item.data.Category)
+      }
+    })
+    setCategories(catarr)
+   }
+
     useEffect(() => {
+      retriveCategories()
       if (searchQuery.trim() === '') {
-        setFilteredProjects(arrayofprojects);
+        if(mincost===0 && maxcost===0 && selectedCategories.length===0){
+       
+          setFilteredProjects(arrayofprojects);
+        }else{
+          const filtered = arrayofprojects.filter((project) =>
+          (project.data.Budget >= mincost && project.data.Budget <= maxcost) ||
+          (selectedCategories.includes(project.data.Category))
+        );  
+        setFilteredProjects(filtered);
+        }
       } else {
+      
         const filtered = arrayofprojects.filter((project) =>
           project.data.Title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          project.data.Category.toLowerCase().includes(searchQuery.toLowerCase())
+          project.data.Category.toLowerCase().includes(searchQuery.toLowerCase()) 
         );
+        console.log(filtered);
         setFilteredProjects(filtered);
       }
-    }, [searchQuery, arrayofprojects]);
+    }, [searchQuery, arrayofprojects, mincost, maxcost,selectedCategories]);
 
 
     const handleToggleDrawer = () => {
@@ -77,8 +95,8 @@ export default function Home({arrayofprojects, user}):ReactElement<any,any> {
         <link rel="icon" href="/favicon.ico" />
       </Head>
    
-  <div className="container mx-auto h-dvh">  
-    <div className="flex items-center  pt-3 gap-4 justify-center" >
+  <div className="mx-auto lg:h-screen sm:h-dvh">  
+    <div className="flex items-center  pt-3 gap-4 justify-around" >
   <ListIcon
     className="w-8 h-8 cursor-pointer text-violet-black"
     onClick={handleToggleDrawer}
@@ -88,81 +106,36 @@ export default function Home({arrayofprojects, user}):ReactElement<any,any> {
     placeholder="Search..."
     value={searchQuery}
     onChange={handleInputChange}
-    className="w-1/2  p-2 rounded-md border-none w-full h-10 shadow-sm bg-gray-900 focus:bg-black text-gray-700 text-base focus:outline-none"
+    className="w-96  p-2 rounded-md border-none h-10 shadow-sm bg-gray-900 focus:bg-black text-gray-700 text-base focus:outline-none"
   />
   <button onClick={handleSearch} className="px-4 py-2 rounded-md bg-violet-900 text-white font-bold">Search</button>
   <NavigationDrawer isOpen={isDrawerOpen} onClose={handleToggleDrawer} isLoggin={isLoggin} uid={user} />
 </div>
+ 
 
-
-      <h3 className="text-center">All Projects that are available currently</h3>
-      
+<div className='lg:grid grid-cols-4 mt-10 gap-10'>
+<div className={styles.filter}
+id='filter'
+><Filter mincost={mincost} maxcost={maxcost}  setMax={setmaxCost} setMin={setminCost} categories={categories} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories}/>
+</div>
+<div className='col-span-3 scroll'>
      {filteredProjects.map((item)=>{
       return(
      <Card item={item} user={user}></Card>
       )
   
      })}
-    
-
-      </div>
-    
+</div>
+</div>
+  </div>
     </>
   )
 }
 
-const NavigationDrawer = ({ isOpen, onClose,isLoggin,uid }) => {
-  const router=useRouter()
-  return (
-    <Drawer anchor="left" open={isOpen} onClose={onClose}>
-      
-      <Box sx={{ width: 250 }} role="presentation" onClick={onClose} onKeyDown={onClose}>
-        <List>
-          <ListItem>
-            <Avatar />
-          </ListItem>
-          <ListItem>
-            <ListItemText primary="John Doe" />
-          </ListItem>
-          <Divider />
-          <ListSubheader>Navigation</ListSubheader>
-          <ListItem button>
-            <ListItemIcon>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" onClick={()=>{
-              router.push({pathname:'/userdashboard',query:{uid:uid.uid}})
-            }} />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Settings" />
-          </ListItem>
-          <Divider />
-          <ListSubheader>Account</ListSubheader>
-          <ListItem button>
-            <ListItemIcon>
-              <AccountBox/>
-            </ListItemIcon>
-            {/* <ListItemText primary="Sign in/Sing Up"   /> */}
-          <Link href='/clientregister'>Client Sign In</Link>
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <PersonAdd/>
-            </ListItemIcon>
-            <Link href='/useregister'>Freelancer Sign In</Link>
-          </ListItem>
-        </List>
-      </Box>
-    </Drawer>
-  );
-};
 
 
 export async function getServerSideProps(context:any):Promise<any> {
+  let arrayofprojects: { id: any, data: any }[] = [];
   const {uid}=context.query
   const db = getFirestore(app);
   let user:DocumentData | null = null;

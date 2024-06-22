@@ -20,7 +20,8 @@ export default function ProjectDetails({ project,uid,clientid ,proid}) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="max-w-md mx-auto p-6 border border-gray-700 rounded-lg shadow-lg bg-gray-800 text-white mb-6 font-sans ">
+      <div className='h-screen'>
+       <div className="max-w-md mx-auto p-6 border border-gray-700 rounded-lg shadow-lg bg-gray-800 text-white mb-6 font-sans  ">
   <h1 className="text-3xl font-bold mb-4 text-violet-400">{project.Title}</h1>
   <p className="text-lg leading-relaxed mb-6">{project.Des}</p>
   <div className="flex items-center justify-between mb-6">
@@ -49,7 +50,7 @@ export default function ProjectDetails({ project,uid,clientid ,proid}) {
     Apply
   </button>
 </div>
-
+</div>
 
     </>
   )
