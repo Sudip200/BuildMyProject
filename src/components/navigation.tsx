@@ -2,8 +2,17 @@ import { Drawer, Box, List, ListItem, ListItemText, Divider, ListSubheader, List
 import { Dashboard as DashboardIcon, Settings as SettingsIcon, AccountBox, PersonAdd } from '@mui/icons-material';
 import { useRouter } from 'next/router';
 
-const NavigationDrawer = ({ isOpen, onClose, isLoggin, uid }) => {
+const NavigationDrawer = ({ isOpen, onClose, isLoggin, uid ,login }) => {
   const router = useRouter();
+  const sx={
+    color: 'white',
+    textDecoration: 'none'
+  }
+  const graysx={
+    backgroundColor: 'rgb(31, 41, 55)',
+    color: 'white'
+
+  }
   return (
     <Drawer
       anchor="left"
@@ -30,9 +39,9 @@ const NavigationDrawer = ({ isOpen, onClose, isLoggin, uid }) => {
           <ListItem>
             <ListItemText primary="John Doe" className="text-white" />
           </ListItem>
-          <Divider className="bg-gray-600" />
-          <ListSubheader className="bg-gray-800 text-gray-400">Navigation</ListSubheader>
-          <ListItem button onClick={() => router.push({ pathname: '/userdashboard', query: { uid: uid.uid } })}>
+          <Divider  style={{border: '0.2px solid white'}}  />
+          <ListSubheader sx={graysx}>Navigation</ListSubheader>
+          <ListItem button onClick={() => login.login=='Client'? router.push({ pathname: '/clientdashboard'}):router.push({pathname:'/userdashboard'})}>
             <ListItemIcon className="text-gray-400">
               <DashboardIcon />
             </ListItemIcon>
@@ -44,19 +53,19 @@ const NavigationDrawer = ({ isOpen, onClose, isLoggin, uid }) => {
             </ListItemIcon>
             <ListItemText primary="Settings" className="text-white" />
           </ListItem>
-          <Divider className="bg-gray-600" />
-          <ListSubheader className="bg-gray-800 text-gray-400">Account</ListSubheader>
+          <Divider style={{border: '0.2px solid white'}} />
+          <ListSubheader sx={graysx} >Account</ListSubheader>
           <ListItem button>
             <ListItemIcon className="text-gray-400">
               <AccountBox />
             </ListItemIcon>
-            <Link href='/clientregister' className="text-white no-underline hover:underline">Client Sign In</Link>
+            <Link href='/clientregister' sx={sx}>Client Sign In</Link>
           </ListItem>
           <ListItem button>
             <ListItemIcon className="text-gray-400">
               <PersonAdd />
             </ListItemIcon>
-            <Link href='/useregister' className="text-white no-underline hover:underline">Freelancer Sign In</Link>
+            <Link href='/useregister' sx={sx}>Freelancer Sign In</Link>
           </ListItem>
         </List>
       </Box>

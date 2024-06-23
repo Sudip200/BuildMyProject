@@ -6,34 +6,35 @@ const Card=({item,user}):ReactElement=>{
 const router = useRouter();
 
 
-return( 
-  <div className="
-  flex flex-col justify-center shadow-lg text-white border border-gray-800 rounded-lg
-   p-6 mx-auto my-6 text-center  bg-gray-800 w-full " key={item.id}>
-    <div className="flex items-center
-    sm:flex-col gap-1 lg:flex-row  lg:justify-around" >
- 
-    <div><h2 className="text-3xl font-semibold mb-2 text-violet-400">{item.data.Title}</h2></div>
-    <div>
-      <p className="mt-2 text-gray-400">{item.data.uploadedBy}</p>
-      <p className="text-gray-400">{item.data.Category}</p>
-      <p className="text-gray-400 mb-4">{item.data.SubCategory}</p>
+return (
+  <div className="flex flex-col justify-center shadow-lg text-white border border-gray-800 rounded-lg p-4 mx-auto my-6 text-center bg-gray-800 lg:w-full sm:h-44" key={item.id}>
+  <div className="flex  flex-row justify-between items-center gap-1 ">
+    <div className="flex flex-col items-start lg:items-center lg:w-1/3">
+      <h2 className="text-xl font-semibold mb-1 text-violet-400 truncate">{item.data.Title}</h2>
     </div>
-    <div className="sm:justify-self-center lg:justify-self-end">
-    <h1 className="text-2xl text-green-500 mb-4">₹{item.data.Budget}</h1>
-    <button className="bg-violet-900 hover:bg-violet-950 text-white px-5 py-2 rounded-md font-bold transition-colors" onClick={() => {
-      router.push({ pathname: '/projectdetails', query: { proid: item.id, uid: user.uid, clientid: item.data.uid } });
-    }}>
-      Apply
-    </button>
+    <div className="flex flex-col items-start lg:items-center lg:block lg:w-1/3 sm:hidden">
+      <p className="mt-1 text-gray-400 truncate">{item.data.uploadedBy}</p>
+      <p className="text-gray-400 truncate">{item.data.Category}</p>
+      <p className="text-gray-400 mb-2 truncate">{item.data.SubCategory}</p>
+    </div>
+    <div className="flex flex-col items-start lg:items-center lg:w-1/3">
+      <h1 className="text-lg text-green-500 mb-2">₹{item.data.Budget}</h1>
+      <button
+        className="bg-violet-900 hover:bg-violet-950 text-white px-3 py-1 rounded-md font-bold transition-colors text-sm"
+        onClick={() => {
+          router.push({ pathname: '/projectdetails', query: { proid: item.id, uid: user.uid, clientid: item.data.uid } });
+        }}
+      >
+        Apply
+      </button>
+    </div>
   </div>
-</div>
-<div className="flex sm:justify-center lg:justify-start w-full mt-5">
+  <div className="flex justify-center lg:justify-start w-full mt-2">
     <Skills skills={item.data.Skills} />
   </div>
 </div>
 
-  )
+);
 }
 
 export default Card

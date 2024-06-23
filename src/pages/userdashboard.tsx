@@ -48,19 +48,40 @@ useEffect(()=>{
        
       </Head>
      
-    <div className="flex wrap bg-blue" style={{display:'flex',flexWrap:'wrap',justifyContent:'center',gap:'20px'}}>
-      <h2>Welcome {user.name} </h2>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px',maxWidth:'300px'}}>Total Earnings</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}  onClick={()=>{router.push({pathname:'/allapplication',query:{Userid:user.uid}})}}    >All Applications</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}} >Saved Projects</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Apply as Mentor</div>
-<div style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}
-onClick={()=>{
-  router.push({pathname:'/'})
-}}
->Apply for more Projects</div>
-<div  style={{background:'#e6e6e6',padding:'100px',borderRadius:'10px'}}>Get a Mentor for Projects</div>
-    </div> 
+      <div className="min-h-screen bg-gray-900 text-white p-6">
+      <h2 className="text-3xl font-semibold mb-6">Welcome, {user.name}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-blue-600 p-4 rounded-lg shadow-lg">
+          <h3 className="text-xl font-semibold mb-2">Total Earnings</h3>
+          <p className="text-lg">₹0</p>
+        </div>
+        <div
+          className="bg-green-600 p-4 rounded-lg shadow-lg cursor-pointer hover:bg-green-700 transition-colors"
+          onClick={() => {
+            router.push({ pathname: '/allapplication', query: { Userid: user.uid } });
+          }}
+        >
+          <h3 className="text-xl font-semibold mb-2">All Applications</h3>
+        </div>
+        <div className="bg-purple-600 p-4 rounded-lg shadow-lg">
+          <h3 className="text-xl font-semibold mb-2">Saved Projects</h3>
+        </div>
+        <div className="bg-yellow-600 p-4 rounded-lg shadow-lg">
+          <h3 className="text-xl font-semibold mb-2">Apply as Mentor</h3>
+        </div>
+        <div
+          className="bg-red-600 p-4 rounded-lg shadow-lg cursor-pointer hover:bg-red-700 transition-colors"
+          onClick={() => {
+            router.push({ pathname: '/' });
+          }}
+        >
+          <h3 className="text-xl font-semibold mb-2">Apply for More Projects</h3>
+        </div>
+        <div className="bg-indigo-600 p-4 rounded-lg shadow-lg">
+          <h3 className="text-xl font-semibold mb-2">Get a Mentor for Projects</h3>
+        </div>
+      </div>
+    </div>
    
     </>
   )

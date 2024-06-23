@@ -20,6 +20,7 @@ import Filter from '../components/filter'
 import Script from 'next/script'
 import Card from '../components/projectcard'
 import DarkModeLayout from '../components/layout'
+import {useSelector,useDispatch} from 'react-redux';
 
 export default function Home({ arrayofprojects, user }: { arrayofprojects: { id: any, data: any }[], user: any }): ReactElement<any, any> {
   const [isSignup, setSignUp] = useState(false);
@@ -35,7 +36,8 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
     const [selectedCategories,setSelectedCategories]=useState([])
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const [filteredProjects, setFilteredProjects] = useState([]);
-   
+    const loggedin = useSelector((state:any)=>state.login)
+    console.log(loggedin)
    const retriveCategories = ():void=>{
     let catarr:string[]=[]
     arrayofprojects.map((item)=>{
@@ -95,39 +97,53 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
         <link rel="icon" href="/favicon.ico" />
       </Head>
    
-  <div className="mx-auto lg:h-screen sm:h-dvh">  
-    <div className="flex items-center  pt-3 gap-4 justify-around" >
-  <ListIcon
-    className="w-8 h-8 cursor-pointer text-violet-black"
-    onClick={handleToggleDrawer}
-  />
-  <input
-    type="text"
-    placeholder="Search..."
-    value={searchQuery}
-    onChange={handleInputChange}
-    className="w-96  p-2 rounded-md border-none h-10 shadow-sm bg-gray-900 focus:bg-black text-gray-700 text-base focus:outline-none"
-  />
-  <button onClick={handleSearch} className="px-4 py-2 rounded-md bg-violet-900 text-white font-bold">Search</button>
-  <NavigationDrawer isOpen={isDrawerOpen} onClose={handleToggleDrawer} isLoggin={isLoggin} uid={user} />
-</div>
- 
+      <div className="mx-auto lg:h-screen sm:min-h-screen  p-4">
+      <div className="flex items-center gap-4 justify-around pt-3">
+        <ListIcon
+          className="w-8 h-8 cursor-pointer text-violet-600"
+          onClick={handleToggleDrawer}
+        />
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={handleInputChange}
+          className="flex-1 p-2 rounded-md border-none shadow-sm bg-white focus:bg-gray-200 text-gray-900 text-base focus:outline-none"
+        />
+        <button
+          onClick={handleSearch}
+          className="px-4 py-2 rounded-md bg-violet-600 hover:bg-violet-700 text-white font-bold transition-colors"
+        >
+          Search
+        </button>
+        <NavigationDrawer
+          isOpen={isDrawerOpen}
+          onClose={handleToggleDrawer}
+          isLoggin={isLoggin}
+          uid={user}
+          login={loggedin}
+        />
+      </div>
 
-<div className='lg:grid grid-cols-4 mt-10 gap-10'>
-<div className={styles.filter}
-id='filter'
-><Filter mincost={mincost} maxcost={maxcost}  setMax={setmaxCost} setMin={setminCost} categories={categories} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories}/>
-</div>
-<div className='col-span-3 scroll'>
-     {filteredProjects.map((item)=>{
-      return(
-     <Card item={item} user={user}></Card>
-      )
-  
-     })}
-</div>
-</div>
-  </div>
+      <div className="lg:grid grid-cols-4 mt-10 gap-10">
+        <div className="col-span-1 hidden lg:block">
+          <Filter
+            mincost={mincost}
+            maxcost={maxcost}
+            setMax={setmaxCost}
+            setMin={setminCost}
+            categories={categories}
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
+          />
+        </div>
+        <div className="col-span-3">
+          {filteredProjects.map((item) => (
+            <Card key={item.id} item={item} user={user} />
+          ))}
+        </div>
+      </div>
+    </div>
     </>
   )
 }
