@@ -1,14 +1,17 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { useEffect, useState } from 'react'
+import { useEffect, useState,useContext } from 'react'
 import Link from 'next/link'
 import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc, Timestamp, serverTimestamp} from "firebase/firestore"
 import { async } from '@firebase/util'
 import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
-import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
+import { getStorage ,ref as storageRefer,uploadBytes,getDownloadURL} from "firebase/storage";
 import { useRouter } from 'next/router'
+import { useSelector } from 'react-redux'
+import { UserContext } from '../context/context';
+import { getDatabase ,set,ref as databaseRef} from 'firebase/database'
 
 export default function ProposalSend({projectId,Uid,clientid}) {
       
@@ -16,55 +19,94 @@ export default function ProposalSend({projectId,Uid,clientid}) {
    const storage = getStorage(app);
    const [name, setName] = useState("");
    const [email, setEmail] = useState("");
+   const proRef=collection(db,"messages");
+   const [ uid,setUid]=useState('')
+   const realtimedb = getDatabase(app)
    const [proposal, setProposal] = useState("");
    const [link, setLink] = useState("");
    const [resume, setResume] = useState(null);
-  const router =useRouter()
-  if(Uid==='none'){
-     router.push({pathname:'/useregister'})   
+   const user = useContext(UserContext)
+   const loggedin = useSelector((state:any)=>state.login)
+   const router =useRouter()
+   const [ downloadUrl, setDownloadURL] = useState('')
+   function checkUser(){
+    if(!user || !(loggedin.login === 'User') ){
+      router.push({pathname:'/useregister'})   
+   }else{
+      setUid(user.uid)
+   }
   }
-   const storageRef = ref(storage,`resumes/${resume}`);
+
+  useEffect(()=>{
+    if(user){
+      checkUser()
+    }
+  })
+  
    const handleSubmit = (e) => {
      e.preventDefault();
      // Do something with form data
-     const proRef=collection(db,"messages");
-     uploadBytes(storageRef, resume).then((snapshot) => {
-      console.log('Uploaded a blob or file!');
-      getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
-          addDoc(proRef,{
+    set(databaseRef(realtimedb,`/messages/${clientid}/${uid}/${projectId}/1`),{
+      users: [clientid, uid].sort(),
+      sender:uid,
+      recipient: clientid,
+      projectId:projectId,
+      message:`Hi My Name is ${name} email ${email} 
+      ${proposal} .My Url link ${link} .My Resume link ${downloadUrl}`,
+      timestamp: serverTimestamp(),
+    }
+    ).then((res)=>{router.push({pathname:'/chatscreen',query:{
+      clientid:clientid,
+      projectId:projectId,
+    }})}).catch(err=>alert(err))
+
+    //  addDoc(proRef,{
           
-            users: [clientid, Uid].sort(),
-            sender:Uid,
-            recipient: clientid,
-            message:`Hi My Name is ${name} email ${email} 
-            ${proposal} .My Url link ${link} .My Resume link ${url}`,
-            timestamp: serverTimestamp(),
-          }).then((res)=>{
-           router.push({pathname:'/chatscreen',query:{clienttId:clientid, Userid:Uid}})
-          }).catch(err=>alert(err));
-      })
-    }).catch(err=>alert(err));
+    //   users: [clientid, uid].sort(),
+    //   sender:uid,
+    //   recipient: clientid,
+    //   projectId:projectId,
+    //   message:`Hi My Name is ${name} email ${email} 
+    //   ${proposal} .My Url link ${link} .My Resume link ${downloadUrl}`,
+    //   timestamp: serverTimestamp(),
+    // }).then((res)=>{
+    //     router.push({pathname:'/userdashboard'})
+    // }).catch(err=>alert(err));
+      
    };
-   const handleSubmitProposal=(e)=>{
-    e.preventDefault()
-    const proRef=collection(db,"Proposal");
-    uploadBytes(storageRef, resume).then((snapshot) => {
-     console.log('Uploaded a blob or file!');
-     getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
-         addDoc(proRef,{
-            projectid:projectId,
-            uid:Uid,
-            name:name,
-            email:email,
-            proposal:proposal,
-            link:link,
-            resume:url
-         }).then((res)=>{
-          router.push({pathname:'/userdashboard',query:{uid:Uid}})
-         }).catch(err=>alert(err));
-     })
-   }).catch(err=>alert(err));
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault()
+      const storageRef = storageRefer(storage,`resumes/${e.target.files[0].name}`);
+      setResume(e.target.files[0])
+      uploadBytes(storageRef, e.target.files[0]).then((snapshot) => {
+        console.log('Uploaded a blob or file!');
+        getDownloadURL(storageRefer(storage,`resumes/${e.target.files[0].name}`)).then((url)=>{
+            setDownloadURL(url)
+        })
+      }).catch(err=>alert(err));
+    console.log(downloadUrl)
    }
+   
+  //  const handleSubmitProposal=(e)=>{
+  //   e.preventDefault()
+  //   const proRef=collection(db,"Proposal");
+  //   uploadBytes(storageRef, resume).then((snapshot) => {
+  //    console.log('Uploaded a blob or file!');
+  //    getDownloadURL(ref(storage,`resumes/${resume}`)).then((url)=>{
+  //        addDoc(proRef,{
+  //           projectid:projectId,
+  //           uid:Uid,
+  //           name:name,
+  //           email:email,
+  //           proposal:proposal,
+  //           link:link,
+  //           resume:url
+  //        }).then((res)=>{
+  //         router.push({pathname:'/userdashboard',query:{uid:Uid}})
+  //        }).catch(err=>alert(err));
+  //    })
+  //  }).catch(err=>alert(err));
+  //  }
   return (
     <>
       <Head>
@@ -74,24 +116,12 @@ export default function ProposalSend({projectId,Uid,clientid}) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
      
-     <div>
+      <div className="flex justify-center min-h-screen ">
   <form
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      maxWidth: "500px",
-      margin: "0 auto",
-      padding: "20px",
-      borderRadius: "5px",
-      boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-      backgroundColor: "#f7f7f7",
-    }}
-    onSubmit={handleSubmitProposal}
+    className="flex flex-col max-w-md w-full p-6 bg-gray-800 rounded-lg shadow-lg"
+    onSubmit={handleSubmit}
   >
-    <label
-      htmlFor="name"
-      style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "5px" }}
-    >
+    <label htmlFor="name" className="text-lg font-semibold text-violet-400 mb-2">
       Name
     </label>
     <input
@@ -99,23 +129,12 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       id="name"
       name="name"
       value={name}
-      
       onChange={(e) => setName(e.target.value)}
-      style={{
-        padding: "10px",
-        borderRadius: "5px",
-        border: "none",
-        backgroundColor: "#fff",
-        marginBottom: "10px",
-        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-      }}
+      className="p-3 mb-4 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-violet-500 outline-none"
       required
     />
 
-    <label
-      htmlFor="email"
-      style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "5px" }}
-    >
+    <label htmlFor="email" className="text-lg font-semibold text-violet-400 mb-2">
       Contact Email
     </label>
     <input
@@ -124,21 +143,11 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       name="email"
       value={email}
       onChange={(e) => setEmail(e.target.value)}
-      style={{
-        padding: "10px",
-        borderRadius: "5px",
-        border: "none",
-        backgroundColor: "#fff",
-        marginBottom: "10px",
-        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-      }}
+      className="p-3 mb-4 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-violet-500 outline-none"
       required
     />
 
-    <label
-      htmlFor="proposal"
-      style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "5px" }}
-    >
+    <label htmlFor="proposal" className="text-lg font-semibold text-violet-400 mb-2">
       Proposal
     </label>
     <textarea
@@ -146,23 +155,12 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       name="proposal"
       value={proposal}
       onChange={(e) => setProposal(e.target.value)}
-      style={{
-        padding: "10px",
-        borderRadius: "5px",
-        border: "none",
-        backgroundColor: "#fff",
-        marginBottom: "10px",
-        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-        resize: "vertical",
-        minHeight: "100px",
-      }}
+      className="p-3 mb-4 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-violet-500 outline-none resize-vertical"
       required
+      
     />
 
-    <label
-      htmlFor="link"
-      style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "5px" }}
-    >
+    <label htmlFor="link" className="text-lg font-semibold text-violet-400 mb-2">
       Relevant Link
     </label>
     <input
@@ -171,65 +169,40 @@ export default function ProposalSend({projectId,Uid,clientid}) {
       name="link"
       value={link}
       onChange={(e) => setLink(e.target.value)}
-      style={{
-        padding: "10px",
-        borderRadius: "5px",
-        border: "none",
-        backgroundColor: "#fff",
-        marginBottom: "10px",
-        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-      }}
+      className="p-3 mb-4 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-violet-500 outline-none"
       required
     />
 
-    <label
-      htmlFor="resume"
-      style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "5px" }}
-    >
+    <label htmlFor="resume" className="text-lg font-semibold text-violet-400 mb-2">
       Resume Upload
     </label>
     <input
       type="file"
       id="resume"
       name="resume"
-      onChange={(e) => setResume(e.target.files[0])}
-      style={{
-      padding: "10px",
-      borderRadius: "5px",
-      border: "none",
-      backgroundColor: "#fff",
-      marginBottom: "10px",
-      boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-      }}
+      onChange={(e) => handleFileUpload(e)}
+      className="p-3 mb-4 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-violet-500 outline-none"
       required
-      /><button
+    />
+
+    <button
       type="submit"
-      style={{
-        padding: "10px",
-        borderRadius: "5px",
-        border: "none",
-        backgroundColor: "#4caf50",
-        color: "#fff",
-        fontWeight: "bold",
-        cursor: "pointer",
-        transition: "all 0.3s ease-in-out",
-      }}
+      className="p-3 rounded-md bg-violet-700 text-white font-bold hover:bg-violet-800 transition-colors"
     >
       Submit
     </button>
-    </form>
+  </form>
 </div>
+
     </>
   )
 }
 export async function getServerSideProps({ query}) {
   const projectId = query.proid;
-  const Uid = query.uid;
   const clientid=query.clientid;
     return {
       props: {
         projectId,
-        Uid:Uid?Uid:'none',
          clientid
       }
     }

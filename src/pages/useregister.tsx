@@ -5,6 +5,8 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLo
 import { getFirestore, doc, setDoc, DocumentData } from 'firebase/firestore';
 import Image from 'next/image';
 import app from '../firebase';
+import { useDispatch } from 'react-redux';
+import { userLoggedin } from '../store/store';
 
 export default function UserRegistration({ project, uid, clientid }) {
   const [name, setName] = useState('');
@@ -13,6 +15,7 @@ export default function UserRegistration({ project, uid, clientid }) {
   const [r, setR] = useState(true);
   const [id, setId] = useState('');
   const db = getFirestore(app);
+  const dispatch = useDispatch();
   const provider = new GoogleAuthProvider();
   const auth = getAuth();
   const router = useRouter();
@@ -37,6 +40,7 @@ export default function UserRegistration({ project, uid, clientid }) {
           pic: user.photoURL
         }).then((res) => {
           console.log(res);
+          dispatch(userLoggedin());
           setId(user.uid);
           setPersistence(auth, browserLocalPersistence)
             .then(() => {
@@ -67,6 +71,7 @@ export default function UserRegistration({ project, uid, clientid }) {
           uid: user.uid,
           pic: user.photoURL
         }).then((res) => {
+          dispatch(userLoggedin());
            router.push({ pathname: '/userdashboard' });
         }).catch((err) => {
           console.log(err);
@@ -84,6 +89,7 @@ export default function UserRegistration({ project, uid, clientid }) {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
+        dispatch(userLoggedin());
         setId(user.uid);
         router.push({ pathname: '/userdashboard' });
       })

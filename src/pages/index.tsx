@@ -108,7 +108,7 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
           placeholder="Search..."
           value={searchQuery}
           onChange={handleInputChange}
-          className="flex-1 p-2 rounded-md border-none shadow-sm bg-white focus:bg-gray-200 text-gray-900 text-base focus:outline-none"
+          className=" w-96 p-2 rounded-md border-none shadow-sm bg-gray-800 focus:bg-gray-500 text-white text-base focus:outline-none"
         />
         <button
           onClick={handleSearch}

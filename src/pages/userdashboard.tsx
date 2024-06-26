@@ -58,7 +58,7 @@ useEffect(()=>{
         <div
           className="bg-green-600 p-4 rounded-lg shadow-lg cursor-pointer hover:bg-green-700 transition-colors"
           onClick={() => {
-            router.push({ pathname: '/allapplication', query: { Userid: user.uid } });
+            router.push({ pathname: '/allapplication' });
           }}
         >
           <h3 className="text-xl font-semibold mb-2">All Applications</h3>

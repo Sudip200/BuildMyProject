@@ -1,65 +1,73 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { useEffect, useParams, useState } from 'react'
+import { useEffect, useContext, useState, use } from 'react'
 
 import app from "../firebase"
 import {collection,doc,setDoc,getDocs,getFirestore,addDoc, getDoc,query,where,orderBy, serverTimestamp} from "firebase/firestore"
 import { async } from '@firebase/util'
 import { onSnapshot } from 'firebase/firestore'
-
+import {UserContext} from '../context/context'
+import { getDatabase, ref, onValue,set } from "firebase/database";
 //import { getAuth, onAuthStateChanged ,createUserWithEmailAndPassword,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
-import { getStorage ,ref,uploadBytes,getDownloadURL} from "firebase/storage";
+import {useSelector,useDispatch} from 'react-redux';
 import Link from 'next/link'
 
+
  
-export default function ChatScreen({clientId,UserId}) {
-  const db=getFirestore(app);
+export default function ChatScreen({clientId,projectId}) {
+    const db=getFirestore(app);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const [clientName,setC]=useState('')
+    const [ uid2,setU2]=useState('')
+    const [uid1,setU1]=useState('')
     const [userName,setU]=useState('')
-    console.log(clientId +UserId)
-    useEffect(() => {
- 
-      const userref=doc(db,"Users",UserId);
-      const clientref=doc(db,"clients",clientId);
-  getDoc(userref).then((res)=>{
-    setU(res.data().name)
-  })
-
-  getDoc(clientref).then((res)=>{
-    setC(res.data().name)
-  })
-    
-
-      const messagesQuery = query(
-        collection(db, 'messages'),
-        where('users', '==', [clientId, UserId]?.sort()),
-        orderBy('timestamp')
-      );
-      
-      // Set up onSnapshot listener
-      onSnapshot(messagesQuery, querySnapshot => {
-        const newMessages = [];
-        querySnapshot.forEach(doc => {
-          console.log(doc.data())
-          newMessages.push(doc.data());
-        });
-        setMessages(newMessages);
+    const realtimedb = getDatabase(app);
+    const messagesRef = ref(realtimedb, 'messages');
+    const [messageLength ,setMessageLength]= useState(0)
+    const loggedin = useSelector((state:any)=>state.login)
+    const user = useContext(UserContext);
+    const getUser = async () => {
+      const uid1 = user.uid;
+      const uid2 = clientId;
+      setU1(uid1)
+      setU2(uid2)
+      const messagesRef = ref(realtimedb,`/messages/${clientId}/${user.uid}/${projectId}`);
+      onValue(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        if(data){
+          setMessageLength(Object.keys(data).length)
+          console.log(data)
+          setMessages(data)
+        }
       });
-    }, [clientId, UserId,db]);
+    }
+    useEffect(() => {
+     if(user && clientId){
+       getUser()
+     }
+    
+    }, [user,clientId]);
   
     const sendMessage = () => {
-      const messRef=collection(db,"messages");
-      addDoc(messRef,{
-        users: [clientId, UserId].sort(),
-        sender:UserId,
-        recipient: clientId,
-        message,
-        timestamp: serverTimestamp(),
-      })
-      setMessage('');
+      const messagesRef = ref(realtimedb,`/messages/${clientId}/${user.uid}/${projectId}/${messageLength+1}`);
+      set(messagesRef, {
+        
+          users: [uid2,uid1].sort(),
+          sender:uid1,
+          recipient: clientId,
+          projectId:projectId,
+          message: message,
+          timestamp: serverTimestamp(),
+        
+      }
+      ).then(() => {
+        console.log('Message sent successfully');
+        setMessage('');
+      }).catch((error) => {
+        console.error('Error sending message:', error);
+      });
     };
    
 
@@ -96,13 +104,13 @@ export default function ChatScreen({clientId,UserId}) {
       <li key={i} style={{ 
         listStyleType: 'none', 
         padding: '0.5rem 1rem', 
-       
-        textAlign: msg.sender === UserId ? 'right' : 'left' 
+      
       }}>
        
         <strong
-        
-        >{msg.sender === UserId ? 'You' : userName}:</strong>  <div  style={{background:'#E6F0F3',padding:'20px',borderRadius:'10px'}}   >{msg.message}
+        ></strong>  
+        <div  style={{background:'#E6F0F3',padding:'20px',borderRadius:'10px'}}   >
+          {msg.message}
         </div>
       </li>
     ))}
@@ -113,7 +121,6 @@ export default function ChatScreen({clientId,UserId}) {
     padding: '1rem', 
     borderTop: '1px solid #ccc' 
   }}>
-   <Link href="https://paytm.me/e6WB-zQ">Pay to Student</Link>
     <input type="text" value={message} onChange={e => setMessage(e.target.value)} style={{ 
       flex: 1, 
       marginRight: '0.5rem', 
@@ -141,14 +148,14 @@ export default function ChatScreen({clientId,UserId}) {
 
 
 export async function getServerSideProps({ query}) {
-  const clientId = query.clienttId;
-  const UserId = query.Userid;
+  const clientId = query.clientid;
+  const projectId = query.projectId;
   
 
     return {
       props: {
         clientId,
-        UserId
+        projectId
       }
     }
   }
