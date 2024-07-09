@@ -97,18 +97,20 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
         <link rel="icon" href="/favicon.ico" />
       </Head>
    
-      <div className="mx-auto lg:h-screen sm:min-h-screen  p-4">
-      <div className="flex items-center gap-4 justify-around pt-3">
+      <div className="w-full flex p-4">
+        <div className=" flex items-start pt-5  lg:hidden ">
         <ListIcon
           className="w-8 h-8 cursor-pointer text-violet-600"
           onClick={handleToggleDrawer}
-        />
+        /></div>
+        
+      <div className="flex sm:w-full justify-end lg:items-center gap-2 pt-3 px-2">
         <input
           type="text"
           placeholder="Search..."
           value={searchQuery}
           onChange={handleInputChange}
-          className=" w-96 p-2 rounded-md border-none shadow-sm bg-gray-800 focus:bg-gray-500 text-white text-base focus:outline-none"
+          className="lg:w-96 sm:w-36 p-2 rounded-md border-none shadow-sm bg-gray-800 focus:bg-gray-500 text-white text-base focus:outline-none"
         />
         <button
           onClick={handleSearch}
@@ -125,7 +127,10 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
         />
       </div>
 
-      <div className="lg:grid grid-cols-4 mt-10 gap-10">
+      
+    </div>
+    <div className="mx-auto lg:h-screen sm:min-h-screen w-full px-4">
+    <div className="lg:grid grid-cols-4 mt-10 gap-10">
         <div className="col-span-1 hidden lg:block">
           <Filter
             mincost={mincost}
