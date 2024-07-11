@@ -10,7 +10,6 @@ import { useRouter } from 'next/router'
 import React from 'react';
 import Page from 'next';
 import  AccountBox  from '@mui/icons-material/AccountBox'
-import { PersonAdd } from '@mui/icons-material'
 import ListSubheader from '@mui/material/ListSubheader'
 import ListIcon from '@mui/icons-material/List';
 import NavigationDrawer from '../components/navigation'
@@ -21,6 +20,9 @@ import Script from 'next/script'
 import Card from '../components/projectcard'
 import DarkModeLayout from '../components/layout'
 import {useSelector,useDispatch} from 'react-redux';
+import Sidebar from '../components/sidebar'
+import { ArrowCircleLeftRounded, Filter1, FilterAlt } from '@mui/icons-material'
+
 
 export default function Home({ arrayofprojects, user }: { arrayofprojects: { id: any, data: any }[], user: any }): ReactElement<any, any> {
   const [isSignup, setSignUp] = useState(false);
@@ -36,6 +38,7 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
     const [selectedCategories,setSelectedCategories]=useState([])
     const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
     const [filteredProjects, setFilteredProjects] = useState([]);
+    const [show, setShow] = useState(true);
     const loggedin = useSelector((state:any)=>state.login)
     console.log(loggedin)
    const retriveCategories = ():void=>{
@@ -96,15 +99,27 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-   
-      <div className="w-full flex p-4">
-        <div className=" flex items-start pt-5  lg:hidden ">
-        <ListIcon
-          className="w-8 h-8 cursor-pointer text-violet-600"
-          onClick={handleToggleDrawer}
-        /></div>
+   <div className='flex gap-5'>
+   <div className="lg:w-auto hidden lg:block lg:h-auto">
         
-      <div className="flex sm:w-full justify-end lg:items-center gap-2 pt-3 px-2">
+        <Sidebar
+          isLoggin={isLoggin}
+          uid={user}
+          login={loggedin}
+        />
+         
+    </div>
+
+        <div className='w-full'>
+        <div className=" flex p-4 ">
+        <div className=" flex items-start pt-5 lg:hidden ">
+          <ListIcon
+            className="w-8 h-8 cursor-pointer text-violet-600"
+            onClick={handleToggleDrawer}
+          />
+        </div>
+        
+      <div className="flex sm:w-full justify-center lg:justify-end lg:items-center gap-2 pt-3 px-2">
         <input
           type="text"
           placeholder="Search..."
@@ -129,9 +144,12 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
 
       
     </div>
-    <div className="mx-auto lg:h-screen sm:min-h-screen w-full px-4">
-    <div className="lg:grid grid-cols-4 mt-10 gap-10">
-        <div className="col-span-1 hidden lg:block">
+    <div className="mx-auto lg:h-screen sm:min-h-screen ">
+    <div className="lg:flex lg:flex-col  mt-10 gap-8 w-full px-4">
+      <div className="flex flex-col w-full px-4">
+
+        <button className='w-44 bg-violet-600 text-white text-md lg:text-xl font-semibold rounded-md py-1 lg:py-4 hover:bg-violet-800 duration-300 ' onClick={()=>setShow(!show)}><span>{show?"Hide":"Show"}</span> Filter <FilterAlt/></button>
+        { show? <div className='w-1/2 lg:w-1/3 mt-5'>
           <Filter
             mincost={mincost}
             maxcost={maxcost}
@@ -141,14 +159,20 @@ export default function Home({ arrayofprojects, user }: { arrayofprojects: { id:
             selectedCategories={selectedCategories}
             setSelectedCategories={setSelectedCategories}
           />
-        </div>
-        <div className="col-span-3">
+        </div> : null}
+      </div>
+          
+
+        <div className="sm:col-span-3 lg:w-full">
           {filteredProjects.map((item) => (
             <Card key={item.id} item={item} user={user} />
           ))}
         </div>
       </div>
     </div>
+        </div>
+   </div>
+      
     </>
   )
 }
