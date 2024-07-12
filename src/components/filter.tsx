@@ -19,7 +19,7 @@ const Filter = ({ mincost, maxcost, setMax, setMin, categories, selectedCategori
   };
 
   return (
-    <Box className="h-full bg-gray-800 p-4" sx={{ color: 'white' }}>
+    <Box className="h-full bg-gray-900 p-4 rounded-md" sx={{ color: 'white' }}>
       <Typography variant="h6" gutterBottom>
         Filter by Cost
       </Typography>

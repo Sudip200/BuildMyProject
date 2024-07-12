@@ -4,7 +4,7 @@ const Skills = ({ skills }) => {
         {skills.split(",").map((skill) => (
           <span
             key={skill}
-            className="inline-block bg-gray-600 text-white py-1 px-3 mr-2 mb-2 rounded-full "
+            className="inline-block bg-violet-900 text-[min(2vw,.8rem)] py-1 px-3 mr-2 mb-2 rounded-full "
           >
             {skill}
           </span>
